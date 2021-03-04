@@ -6,7 +6,7 @@
 ############################
 
 echo "THE CURRENT DREAM SUITE IS A NON FUNCTIONING W.I.P. TEST !!! BYE !!!"
-echo "Manual configuration should make this program portable and usable on standard *nixes and MacOS, with the following dependencies installed:\n  zsh\n  gettext\n  ffmpeg\nConfiguration steps:\n  1. comment/remove line 10 \"exit 0\"\n  2. $ mkdir ${HOME}/.config/ads\n  3. Move ads_setup, ads.conf, adt.conf, klib.conf, q.conf, template/ to ~/.config/ads\n  4. change lines 11, 17, 20, 36, 39, and 42 of ads.conf to user specification\n  5. make ads executable and call with ./ads\n
+echo "Manual configuration should make this program portable and usable on standard *nixes and MacOS, with the following dependencies installed:\n  zsh\n  gettext\n  ffmpeg\nConfiguration steps:\n  1. comment/remove line 10 \"exit 0\"\n  2. $ mkdir ${HOME}/.config/ads\n  3. Move ads_setup, ads.conf, adt.conf, klib.conf, q.conf, template/ to ~/.config/ads\n  4. change lines 11, 17, 20, 36, 39, and 42 of ads.conf to user specification\n  5. make ads executable and call with ./ads\n"
 exit 1
 
 set -m
