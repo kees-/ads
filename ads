@@ -104,11 +104,6 @@ function bb() {
 		printf "\n"
 	fi
 }
-function is() {
-	. "${c[ad]}ads_setup"
-	echo "The Suite has completed setup. Run it from the command line any time with ${stq}ads${noc}.\n"
-	exit 0
-}
 function kt() {
 	case $(ce 5) in
 		3) echo "\n  Maybe you are the same" ;;
