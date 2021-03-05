@@ -7,6 +7,6 @@ if [ -s "${HOME}/.config/ads" ]; then
 		mv "${un}/.config/ads" "${un}/.config/ads_bak"
 	fi
 fi
-[ -d "${un}/.config" ] || mkdir -p "${un}/.config"
-cp -vR "${@}/lib/" "${un}/.config"
+[ -d "${un}/.config/ads" ] || mkdir -p "${un}/.config/ads"
+cp -vR "${@}/lib/ads/" "${un}/.config/ads"
 [ "${?}" = "0" ] || echo "There was an error copying config files."
