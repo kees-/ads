@@ -7,5 +7,5 @@ if [ -d "${HOME}/.config/ads" ]; then
 	fi
 fi
 mkdir -p "${HOME}/.config"
-cp -v "${@}/lib/ads" "${HOME/.config}"
+cp -vR "${@}/lib/ads" "${HOME/.config}"
 [ "${?}" = "0" ] || echo "There was an error..."
