@@ -8,5 +8,5 @@ if [ -s "${HOME}/.config/ads" ]; then
 	fi
 fi
 [ -d "${un}/.config" ] || mkdir -p "${un}/.config"
-cp -vR "${@}/lib/ads" "${un}/.config"
+cp -vR "${@}/lib/" "${un}/.config"
 [ "${?}" = "0" ] || echo "There was an error copying config files."
