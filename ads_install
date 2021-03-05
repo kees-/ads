@@ -1,11 +1,12 @@
 #!/usr/bin/env zsh
-if [ -d "${HOME}/.config/ads" ]; then
-	echo "Fred Flintstone says: \033[1mI am too stupid to understand even a word of ruby. I see you already have config files in place in the default install directory. I can make a backup for you if you want to keep your current config.\033[0m\nFred Flintstone says, \033[1mI am sorry. You will have to transfer your custom settings manually for now.\033[0m" | fold -sw$(expr ${COLUMNS} - 4) | sed -e "s/ *$//"
+un="$(echo ~"${USER}")"
+if [ -s "${HOME}/.config/ads" ]; then
+	echo "Fred Flintstone says: \033[1mI am too stupid to understand ruby.\nI see you already have config files in place in the default install directory. I can make a backup for you if you want to keep your current config.\033[0m\nFred Flintstone says, \033[1mI am sorry. You will have to transfer your custom settings manually for now.\033[0m" | fold -sw$(expr ${COLUMNS} - 4) | sed -e "s/ *$//"
 	read -sq "yn?Overwrite (y) or backup? (N) "
 	if [ "${yn}" != "y" ]; then
-		mv "~/.config/ads" "~/.config/ads_bak"
+		mv "${un}/.config/ads" "${un}/.config/ads_bak"
 	fi
 fi
-mkdir -p "${HOME}/.config"
-cp -vR "${@}/lib/ads" "~/.config"
-[ "${?}" = "0" ] || echo "There was an error..."
+[ -d "${un}/.config" ] || mkdir -p "${un}/.config"
+cp -vR "${@}/lib/ads" "${un}/.config"
+[ "${?}" = "0" ] || echo "There was an error copying config files."
