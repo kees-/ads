@@ -1,14 +1,21 @@
 #!/usr/bin/env zsh
 ########### todo ###########
 # install and setup script
+#	-> upload, gate if unset
 ########## bugfix ##########
 #
 ############################
 
 set -m
 setopt ksh_arrays
+# is ads setup and ready to use?
+f=1
+if [ "${f}" = "0" ]; then
+	echo "The program does not appear to be set up yet.\nTry running ads_install before use."
+	exit 1
+fi
 declare -A c
-c[ad]="${HOME}/.config/ads/"
+c[ad]=;
 . "${c[ad]}ads.conf"
 . "${c[ad]}adt.conf"
 . "${c[ad]}klib.conf"
@@ -54,9 +61,8 @@ yeq="\033[1;33m"
 spcr=$(printf '%0.1s' "."{1..30})
 splr=20
 
-# e maintains the main input loop to select functions
+# e maintains the main input loop to select functions and all follow
 function e() {
-	[ "${is}" != "1" ] && is
 	printf "${stq}Welcome To The American Dream Suite. Unfortunately you will die.${noc} "
 	ph
 	printf "\n"
@@ -1388,7 +1394,7 @@ function mvgifs() {
 		done
 	else
 		for i in {2..$(expr ${#mv[@]} - 1)}; do
-			mv -iv "/${mv[1]}/${mv[${i}]}" "${c[ws]}${mv[0]}/${mv[${i}]}"
+			mv -i "/${mv[1]}/${mv[${i}]}" "${c[ws]}${mv[0]}/${mv[${i}]}"
 		done
 		bb 56
 		read -sq "yn?Add path to upload queue? (y/N) "

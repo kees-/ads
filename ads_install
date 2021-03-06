@@ -1,12 +1,35 @@
 #!/usr/bin/env zsh
-un="$(echo ~"${USER}")"
-if [ -s "${HOME}/.config/ads" ]; then
-	echo "Fred Flintstone says: \033[1mI am too stupid to understand ruby.\nI see you already have config files in place in the default install directory. I can make a backup for you if you want to keep your current config.\033[0m\nFred Flintstone says, \033[1mI am sorry. You will have to transfer your custom settings manually for now.\033[0m" | fold -sw$(expr ${COLUMNS} - 4) | sed -e "s/ *$//"
-	read -sq "yn?Overwrite (y) or backup? (N) "
+insdir="${HOME}/.config/ads"
+prfx=;
+if [ -z "${prfx}" ]; then
+	echo "Homebrew install seems to have occurred incorrectly"
+	exit 1
+fi
+echo "To complete the setup process, \033[1mads\033[0m needs to copy the default config library somewhere with easier access." | fold -sw$(expr ${COLUMNS} - 6) | sed -e "s/ *$//"
+echo "The default install directory is \033[1m${insdir}\033[0m."
+read -q "yn?Do you want to adjust this? (y/N) "
+printf "\n"
+if [ "${yn}" = "y" ]; then
+	echo "Adjust to the full path of an accessible and stable location:"
+	vared -cp " > " insdir
+fi
+insdir="${insdir%/ads}/ads"
+if [ -s "${insdir}" ]; then
+	echo "Fred Flintstone says: \033[1mI am too stupid to understand ruby. I see you already have config files in place where you chose. I can make a backup for you if you want to keep your current config.\033[0m Fred Flintstone says, \033[1mI am sorry. You will have to transfer your custom settings manually for now.\033[0m" | fold -sw$(expr ${COLUMNS} - 6) | sed -e "s/ *$//"
+	read -q "yn?Overwrite (y) or backup? (N) "
+	printf "\n"
 	if [ "${yn}" != "y" ]; then
-		mv "${un}/.config/ads" "${un}/.config/ads_bak"
+		mv -f "${insdir}" "${insdir}bak_$(date '+%y%m%d_%H.%M.%S')"
 	fi
 fi
-[ -d "${un}/.config/ads" ] || mkdir -p "${un}/.config/ads"
-cp -vR "${@}/lib/ads/" "${un}/.config/ads"
-[ "${?}" = "0" ] || echo "There was an error copying config files."
+[ -d "${insdir}" ] || mkdir -p "${insdir}"
+cp -R "${prfx}/lib/" "${insdir}"
+[ "${?}" = "0" ] || echo "There was an error copying the config files."
+chmod -R +w "${insdir}"
+chmod +w "${prfx}/bin/ads"
+for i in "${prfx}/bin/ads" "${insdir}/ads.conf"; do
+	grep -q "^c\[ad\]=;$" "${i}"
+	[ "${?}" = "0" ] && sed -i '' -e "s/^c\[ad\]=;$/c\[ad\]=\"${insdir//\//\\/}\/\"/" "${i}"
+done
+sed -i '' -e "s/^f=0$/f=1/" "${prfx}/bin/ads"
+exit 0
