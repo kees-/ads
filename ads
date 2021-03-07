@@ -1,7 +1,6 @@
 #!/usr/bin/env zsh
 ########### todo ###########
 # install and setup script
-#	-> upload, gate if unset
 ########## bugfix ##########
 #
 ############################
@@ -9,7 +8,7 @@
 set -m
 setopt ksh_arrays
 # is ads setup and ready to use?
-f=1
+f=0
 if [ "${f}" = "0" ]; then
 	echo "The program does not appear to be set up yet.\nTry running ads_install before use."
 	exit 1
@@ -500,6 +499,11 @@ function sets() {
 function upld() {
 	q=0
 	rtri="upld"
+	if [ -n "${c[un]}" -o -n "${c[us]}" ]; then
+		echo "One or both of your SSH web credentials are unconfigured.\nAdjust them in the settings to proceed."
+		q=1
+		return
+	fi
 	if [ "${w[0]}" != 4 ]; then
 		echo "${grq}You use the toilet$([ "${w[4]}" = 1 ] && echo " again")${noc}"
 	elif [ "${w[0]}" = 4 ]; then

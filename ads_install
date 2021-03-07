@@ -1,13 +1,37 @@
 #!/usr/bin/env zsh
+setopt ksh_arrays
 insdir="${HOME}/.config/ads"
 prfx=;
+declare -a a
+a[0]="To complete the setup process, \033[1mads\033[0;43;103m needs to copy the default config library somewhere with easier access."
+a[1]="The program requires you to fill in a few options before use."
+a[2]="The most important thing needed to publish anything you create is: shell access to a hosted web server."
+a[3]="It is also the most complex thing you need to use the program in full, and so can seem inaccessible for those who have not done web work."
+a[4]="The program is designed to have a very low and portable footprint! You do not need your own home server or access to something you registered. You are highly recommended to freeload in a corner of a trusted friend's server."
+a[5]="In such an instance you only have to ask them to help you set few specific credentials."
+a[6]="The first value is where you want to locally store the structure of what you make."
+a[7]="It should be somewhere stable and easy to access."
+a[8]="You can change this later to relocate or begin a new instance."
+a[9]="In addition to directories for config and holding your project(s), the last local location you must specify is for outputting the media you encode."
+a[10]="This is a intermediate workshop space to create and store unstructured files, as opposed to the more stable directories the program points to."
+a[11]="Make it as simple as your desktop or any other convenient place."
+a[12]="Here is where you need your username and hostname to the web server you are choosing to use."
+a[13]="These will be as simple as \"name\" and \"example.com\" or similar."
+a[14]="You do not have to enter them now, but you will not be able to access the upload utility or publish any sites until you do."
+function bb() {
+	printf "\n"
+	for l in ${@}; do
+		echo "\033[43;103m$(echo "\xe2\x86\x92 ${a[${l}]}" | fold -sw$(expr ${COLUMNS} - 4) | sed -e "s/ *$//" -e "2,$ s/^/  /" -e "s/$/\\\033\[K/")${noc}"
+	done
+	printf "\n"
+}
 if [ -z "${prfx}" ]; then
-	echo "Homebrew install seems to have occurred incorrectly"
+	echo "Homebrew install seems to have occurred incorrectly."
 	exit 1
 fi
-echo "To complete the setup process, \033[1mads\033[0m needs to copy the default config library somewhere with easier access." | fold -sw$(expr ${COLUMNS} - 6) | sed -e "s/ *$//"
+bb 0
 echo "The default install directory is \033[1m${insdir}\033[0m."
-read -q "yn?Do you want to adjust this? (y/N) "
+read -q "yn?Do you want to change this? (y/N) "
 printf "\n"
 if [ "${yn}" = "y" ]; then
 	echo "Adjust to the full path of an accessible and stable location:"
@@ -31,5 +55,43 @@ for i in "${prfx}/bin/ads" "${insdir}/ads.conf"; do
 	grep -q "^c\[ad\]=;$" "${i}"
 	[ "${?}" = "0" ] && sed -i '' -e "s/^c\[ad\]=;$/c\[ad\]=\"${insdir//\//\\/}\/\"/" "${i}"
 done
+#############################################
+bb 1 2 3 4 5
+valtmp=;
+grep -q "^c\[ws\]=\"\"$" "${insdir}/ads.conf"
+if [ "${?}" = "0" ]; then
+	bb 6 7 8
+	echo "Enter the full path of where you want your initial project located:"
+	until [ -n "${valtmp}" ]; do
+		vared -cp " > " valtmp
+	done
+	valtmp="${valtmp:a}"
+	sed -i '' -e "s/^c\[ws\]=\"\"$/c\[ws\]=\"${valtmp//\//\\/}\"/" "${insdir}/ads.conf"
+fi
+#############################################
+valtmp=;
+grep -q "^c\[op\]=\"\"$" "${insdir}/ads.conf"
+if [ "${?}" = "0" ]; then
+	bb 9 10 11
+	echo "Enter the full path you want to use as a workspace:"
+	until [ -n "${valtmp}" ]; do
+		vared -cp " > " valtmp
+	done
+	valtmp="${valtmp:a}"
+	sed -i '' -e "s/^c\[op\]=\"\"$/c\[op\]=\"${valtmp//\//\\/}\"/" "${insdir}/ads.conf"
+fi
+#############################################
+valtmp=;
+grep -q "^c\[un\]=\"\"$" "${insdir}/ads.conf"
+if [ "${?}" = "0" ]; then
+	bb 12 13 14
+	echo "Enter a valid and active SSH username:"
+	until [ -n "${valtmp}" ]; do
+		vared -cp " > " valtmp
+	done
+	sed -i '' -e "s/^c\[un\]=\"\"$/c\[un\]=\"${valtmp//\//\\/}\"/" "${insdir}/ads.conf"
+fi
+#############################################
+echo "ITS NOT READY OK!!! GIVE ME A SEC!!!"
 sed -i '' -e "s/^f=0$/f=1/" "${prfx}/bin/ads"
 exit 0
