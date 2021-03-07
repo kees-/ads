@@ -1,0 +1,66 @@
+.\" Manpage for ads.
+.TH man 8 "09 February 2021" "1.0" "ads man page"
+.SH NAME
+American Dream Suite \- interactive content utility
+.SH SYNOPSIS
+ads
+.SH DESCRIPTION
+The American Dream Suite is a 'minimal' and self-contained web content generator. It is used to create static series of internally hyperlinked gif displays, plus support for external linking and basic displayed images.
+
+All necessary modules are included to step the user through a process from encoding video input to deployment online in an abstruse but convenient method.
+
+The Suite is rigid in its page-by-page formatting, but all possibility for content and structure is open-ended. This leaves convention in full to the user.
+
+By necessity and style limitation, the technology the Suite uses is very antiquated. It does not support complexity at all beyond the web 1.0: hosted file structures and dataless HTML. This implementation is written entirely as a Unix shell script (ZSH) with calls to common open-source CLI utilities.
+
+The end result of the American Dream Suite is so basic it is nonexistent in predetermined function. The meaning/style/purpose of what you create only comes from using it. Communication is essentially visual. It is modeled after a small alternative to a blog, homepage, collected media display, social media page, game, online mini-gallery, etc.
+
+.RB "Its closest resemblance is a simple virtual sculpture whose pieces " "branch endlessly" " and lead to or from anywhere on the internet."
+
+I.e., the premise is not different from the most basic web itself. It only leans into, rather than away from that idea.
+
+A key idea is the open-endedness of the original web with the transfer speeds and developed nature of the modern internet.
+
+Theoretically nothing confines an instance to one creator. Users can each have access to the same instance, have the external link manager connect separately hosted projects, anything else that can be accomplished by the basic functions of the web. With easy manual edits (upload utility still works fine with pages edited out-of-program), projects can connect to each other indistinguishably. Security is considered nonexistent because there is nothing to protect.
+
+Control and access to file structures are not sandboxed at all beyond the utility (itself extremely sandboxed). As such the user can work alongside Dream Suite instances any way they see fit. Even with a very rigid guideline of what the Suite itself generates, this probably sets apart its functionality from many of the online webpage generators that also require zero coding.
+
+The bare bones nature of this program obviously means anything it creates is pretty precarious. However the results are so rudimentary that with mindful use they are unshakable and portable with no issue.
+
+The only real purpose of the software is having a fun and creative way to contribute directly to your presence on the web, which is fully outside the current web standards of users as 'subjects' instead of 'participants.'
+
+The transparency also lends to being a learning tool for web serving or just a fun geek toy.
+
+Your self can live out in the forest instead of the real estate that commandeered the entire web. Go...
+.SH OPTIONS
+ads is initialized with no options. Modules are called by keystroke in the interactive subshell.
+
+.B Note!
+This version of the manual contains no usage instructions. Instead, in a weird non-unix outsider way, activate BABY MODE inside the program to show detailed pointers throughout.
+
+.SH FILES
+\- Config/templates/files used by other features are stored by default in ~/.config/ads and can be set to any other location.
+
+\- On install the user must set a default output location for encoding gifs, for clearer organization than the working directory. This is the main workshop directory.
+
+\- Important: the entire content structure is kept in parallel locally and web hosted. On setup the user chooses stable locations for both. Each is then considered the backup of the other.
+.SH BUGS
+\- Setup is deeply lacking in modern functionality. Will benefit from makefiles instead of a hideous shell script. Version upgrades will probably be a mess.
+
+\- Page editing is very weak (now blocked) outside of pages generated within the Suite.
+
+\- Does not support file hosting, upload, synchronization beyond a web server with direct remote access. (A home setup works fine for the comically paranoid.)
+
+.RS 4
+Server-dumb? Maybe bother a friend for an ssh login to grow your little gif tree in the corner of their personal web domain. Since the content structure is contained to one top path it is no issue to host alongside normal sites or other instances.
+
+Server-whiz? Brainwash your lay friends into enjoying shitty command line utilities, give them a login and a directory, and become the supreme e-bonsai instructor.
+
+The only requirement is access to a directory to use as root folder and somewhere to direct viewers to the starting page(s), a link placed elsewhere or in a message.
+.RE
+
+\- Cap manager only supports basic image formats (no other embedded content).
+
+Formatting and ease of use will be certainly tightened over time.
+
+I completely suck at programming so who cares!!!
