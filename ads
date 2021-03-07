@@ -1,8 +1,9 @@
 #!/usr/bin/env zsh
 ########### todo ###########
 # install and setup script
+# output moved gif names
 ########## bugfix ##########
-#
+# gate unset options
 ############################
 
 set -m
@@ -164,6 +165,7 @@ function qs() {
 	clear
 	printf "${stq}Welcome Back To Your Dream.${noc} "
 	ph
+	printf "\n"
 	p=0
 }
 function vq() {
@@ -499,8 +501,8 @@ function sets() {
 function upld() {
 	q=0
 	rtri="upld"
-	if [ -n "${c[un]}" -o -n "${c[us]}" ]; then
-		echo "One or both of your SSH web credentials are unconfigured.\nAdjust them in the settings to proceed."
+	if [ -z "${c[un]}" -o -z "${c[us]}" ]; then
+		echo "One or both of your SSH web credentials are unconfigured.\nAdjust them in the settings panel to proceed."
 		q=1
 		return
 	fi
@@ -781,6 +783,7 @@ function chpths() {
 				esac
 				echo "Adjust the selected option:"
 				vared -cp "$(echo -ne "\xf0\x9f\x94\x93") > " valtmp
+				if [ "${cwcbnd[${i}]}" = "ad" -o "${cwcbnd[${i}]}" = "op" -a "${cwcbnd[${i}]}" = "ws" ] && valtmp="${valtmp%/}/"
 				sed -i '' -e "$(grep -n "c\[${cptbnd[${i}]}\]=" "${c[ad]}ads.conf" | cut -f1 -d:)s/\"${c[${cptbnd[${i}]}]//\//\\/}\"/\"${valtmp//\//\\/}\"/" "${c[ad]}ads.conf"
 				. "${c[ad]}ads.conf"
 				p1=0
@@ -1786,7 +1789,8 @@ function remlnk() {
 function sshcrd() {
 	p1=1
 	clear
-	echo "${stq}Internet options${noc}\nThe following should not be edited until targeting new locations online for additional sites. User assumes risk!"
+	echo "${stq}Internet options${noc}"
+	"The following should not be edited until targeting new locations online for additional sites. User assumes risk!" | fold -sw $(expr ${COLUMNS} - 4) | sed "s/ *$//"
 	for i in {1..$(expr ${#cwcbnd[@]} - 1)}; do
 		echo "  ${ulq}${i}${noc} ${n[${cwcbnd[${i}]}]}:"
 		echo "    \033[47m${c[${cwcbnd[${i}]}]}\033[0m"
@@ -1812,6 +1816,7 @@ function sshcrd() {
 				esac
 				echo "Adjust the selected option:"
 				vared -cp "$(echo -ne "\xf0\x9f\x94\x93") > " valtmp
+				if [ "${cwcbnd[${i}]}" = "in" -o "${cwcbnd[${i}]}" = "in" ] && valtmp="${valtmp%/}/"
 				sed -i '' -e "$(grep -n "c\[${cwcbnd[${i}]}\]=" "${c[ad]}ads.conf" | cut -f1 -d:)s/\"${c[${cwcbnd[${i}]}]//\//\\/}\"/\"${valtmp//\//\\/}\"/" "${c[ad]}ads.conf"
 				. "${c[ad]}ads.conf"
 				p1=0

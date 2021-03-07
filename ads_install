@@ -5,33 +5,54 @@ prfx=;
 declare -a a
 a[0]="To complete the setup process, \033[1mads\033[0;43;103m needs to copy the default config library somewhere with easier access."
 a[1]="The program requires you to fill in a few options before use."
-a[2]="The most important thing needed to publish anything you create is: shell access to a hosted web server."
-a[3]="It is also the most complex thing you need to use the program in full, and so can seem inaccessible for those who have not done web work."
+a[2]="The most important thing you need to publish any creations is: shell access to a hosted web server."
+a[3]="It is also the most complex thing necessary to use the program in full, so it can seem inaccessible for those who have not done web work."
 a[4]="The program is designed to have a very low and portable footprint! You do not need your own home server or access to something you registered. You are highly recommended to freeload in a corner of a trusted friend's server."
-a[5]="In such an instance you only have to ask them to help you set few specific credentials."
+a[5]="In such an instance you only have to ask them to help you set a few specific credentials."
 a[6]="The first value is where you want to locally store the structure of what you make."
 a[7]="It should be somewhere stable and easy to access."
 a[8]="You can change this later to relocate or begin a new instance."
-a[9]="In addition to directories for config and holding your project(s), the last local location you must specify is for outputting the media you encode."
+a[9]="In addition to directories for config and holding your project(s), the final local location you must specify is for outputting media you encode."
 a[10]="This is a intermediate workshop space to create and store unstructured files, as opposed to the more stable directories the program points to."
-a[11]="Make it as simple as your desktop or any other convenient place."
+a[11]="Make it as simple as your desktop or anywhere else convenient."
 a[12]="Here is where you need your username and hostname to the web server you are choosing to use."
 a[13]="These will be as simple as \"name\" and \"example.com\" or similar."
 a[14]="You do not have to enter them now, but you will not be able to access the upload utility or publish any sites until you do."
+a[15]="You need to define a file path from the root of your chosen web server to the location you will use as a base for the published project."
+a[16]="Entering this path properly is crucial but can be confusing for newcomers."
+a[17]="It is specific to the actual file structure of the server, which browsing users lack access to."
+a[18]="If you already have shell access to a server, you can guide yourself by typing in a command like \033[1mssh name@host.site ls\033[0;43;103m, which lists your files relative to the root."
+a[19]="The path you type will start from one of the directories listed, chosen at your discretion."
+a[20]="For example, \033[4mpublic_html/path_to/dir/\033[0;43;103m or \033[4mmy.sub.domain/path/project/1/\033[0;43;103m or any variant that leads to something web-accessible. Seek help if you are still uncertain."
+a[21]="You need to enter the full URL to where the base of your site will be located online."
+a[22]="It will have some correspondence with the other config options. Example: if your host is \033[4mmyweb.site\033[0;43;103m and root upload path is \033[4mpublic_html/tree/\033[0;43;103m the site could be \033[4mhttps://myweb.site/tree/\033[0;43;103m"
+a[23]="The URL does need to be the homepage or even contain content. All the pages just branch out from here."
+a[24]="Include the URL prefix."
+a[25]="Please note, this install script is truly SICKENING!! A future release will hopefully make for significant streamlining."
+a[26]="Example: \033[4m${HOME}/projects/my_ads/\033[0;43;103m"
+a[27]="It seems like you have already installed ads. All the settings configured in this script can be changed in-program."
+a[28]="It is recommended to check the settings in the program to make sure it is configured properly."
 function bb() {
 	printf "\n"
 	for l in ${@}; do
-		echo "\033[43;103m$(echo "\xe2\x86\x92 ${a[${l}]}" | fold -sw$(expr ${COLUMNS} - 4) | sed -e "s/ *$//" -e "2,$ s/^/  /" -e "s/$/\\\033\[K/")${noc}"
+		echo "\033[43;103m$(echo "\xe2\x86\x92 ${a[${l}]}" | fold -sw$(expr ${COLUMNS} - 6) | sed -e "s/ *$//" -e "2,$ s/^/  /" -e "s/$/\\\033\[K/")\033[0m"
 	done
 	printf "\n"
 }
+if [ -n "${prfx}" ]; then
+	grep -q "^f=1$" "${prfx}/bin/ads"
+	if [ "${?}" = "0" ]; then
+		bb 27
+		exit 0
+	fi
+fi
 if [ -z "${prfx}" ]; then
-	echo "Homebrew install seems to have occurred incorrectly."
+	echo "Homebrew install seems to have occurred incorrectly. Try \033[1mbrew reinstall ads\033[0m"
 	exit 1
 fi
 bb 0
-echo "The default install directory is \033[1m${insdir}\033[0m."
-read -q "yn?Do you want to change this? (y/N) "
+echo "The default install directory is \033[4m${insdir}\033[0m."
+read -sq "yn?Do you want to change this? (y/N) "
 printf "\n"
 if [ "${yn}" = "y" ]; then
 	echo "Adjust to the full path of an accessible and stable location:"
@@ -40,10 +61,12 @@ fi
 insdir="${insdir%/ads}/ads"
 if [ -s "${insdir}" ]; then
 	echo "Fred Flintstone says: \033[1mI am too stupid to understand ruby. I see you already have config files in place where you chose. I can make a backup for you if you want to keep your current config.\033[0m Fred Flintstone says, \033[1mI am sorry. You will have to transfer your custom settings manually for now.\033[0m" | fold -sw$(expr ${COLUMNS} - 6) | sed -e "s/ *$//"
-	read -q "yn?Overwrite (y) or backup? (N) "
+	read -sq "yn?Overwrite (y) or backup? (N) "
 	printf "\n"
 	if [ "${yn}" != "y" ]; then
-		mv -f "${insdir}" "${insdir}bak_$(date '+%y%m%d_%H.%M.%S')"
+		dtnm="_bak$(date '+%y%m%d_%H.%M.%S')"
+		mv -f "${insdir}" "${insdir}${dtnm}"
+		echo "Saved in ${insdir}${dtnm}"
 	fi
 fi
 [ -d "${insdir}" ] || mkdir -p "${insdir}"
@@ -51,26 +74,26 @@ cp -R "${prfx}/lib/" "${insdir}"
 [ "${?}" = "0" ] || echo "There was an error copying the config files."
 chmod -R +w "${insdir}"
 chmod +w "${prfx}/bin/ads"
-for i in "${prfx}/bin/ads" "${insdir}/ads.conf"; do
+insdir="${insdir%/}/"
+for i in "${prfx}/bin/ads" "${insdir}ads.conf"; do
 	grep -q "^c\[ad\]=;$" "${i}"
-	[ "${?}" = "0" ] && sed -i '' -e "s/^c\[ad\]=;$/c\[ad\]=\"${insdir//\//\\/}\/\"/" "${i}"
+	[ "${?}" = "0" ] && sed -i '' -e "s/^c\[ad\]=;$/c\[ad\]=\"${insdir//\//\\/}\"/" "${i}"
 done
-#############################################
 bb 1 2 3 4 5
 valtmp=;
-grep -q "^c\[ws\]=\"\"$" "${insdir}/ads.conf"
+grep -q "^c\[ws\]=\"\"$" "${insdir}ads.conf"
 if [ "${?}" = "0" ]; then
-	bb 6 7 8
+	bb 6 7 8 26
 	echo "Enter the full path of where you want your initial project located:"
 	until [ -n "${valtmp}" ]; do
 		vared -cp " > " valtmp
 	done
 	valtmp="${valtmp:a}"
-	sed -i '' -e "s/^c\[ws\]=\"\"$/c\[ws\]=\"${valtmp//\//\\/}\"/" "${insdir}/ads.conf"
+	valtmp="${valtmp%/}/"
+	sed -i '' -e "s/^c\[ws\]=\"\"$/c\[ws\]=\"${valtmp//\//\\/}\"/" "${insdir}ads.conf"
 fi
-#############################################
 valtmp=;
-grep -q "^c\[op\]=\"\"$" "${insdir}/ads.conf"
+grep -q "^c\[op\]=\"\"$" "${insdir}ads.conf"
 if [ "${?}" = "0" ]; then
 	bb 9 10 11
 	echo "Enter the full path you want to use as a workspace:"
@@ -78,20 +101,62 @@ if [ "${?}" = "0" ]; then
 		vared -cp " > " valtmp
 	done
 	valtmp="${valtmp:a}"
-	sed -i '' -e "s/^c\[op\]=\"\"$/c\[op\]=\"${valtmp//\//\\/}\"/" "${insdir}/ads.conf"
+	valtmp="${valtmp%/}/"
+	sed -i '' -e "s/^c\[op\]=\"\"$/c\[op\]=\"${valtmp//\//\\/}\"/" "${insdir}ads.conf"
 fi
-#############################################
-valtmp=;
-grep -q "^c\[un\]=\"\"$" "${insdir}/ads.conf"
+grep -q -e "^c\[un\]=\"\"$" -e "^c\[us\]=\"\"$" "${insdir}ads.conf"
 if [ "${?}" = "0" ]; then
 	bb 12 13 14
-	echo "Enter a valid and active SSH username:"
+	read -sq "yn?Wait until later, in program, (y) or enter now? (N) "
+	printf "\n"
+	if [ "${yn}" != "y" ]; then
+		grep -q -e "^c\[un\]=\"\"$" "${insdir}ads.conf"
+		if [ "${?}" = "0" ]; then
+			valtmp=;
+			echo "Enter a valid and active SSH username:"
+			until [ -n "${valtmp}" ]; do
+				vared -cp " > " valtmp
+			done
+			sed -i '' -e "s/^c\[un\]=\"\"$/c\[un\]=\"${valtmp//\//\\/}\"/" "${insdir}ads.conf"
+		else
+			echo "Username is already set. Change from settings panel."
+		fi
+		grep -q -e "^c\[us\]=\"\"$" "${insdir}ads.conf"
+		if [ "${?}" = "0" ]; then
+			valtmp=;
+			echo "Enter a valid and active server hostname:"
+			until [ -n "${valtmp}" ]; do
+				vared -cp " > " valtmp
+			done
+			sed -i '' -e "s/^c\[us\]=\"\"$/c\[us\]=\"${valtmp//\//\\/}\"/" "${insdir}ads.conf"
+		else
+			echo "Hostname is already set. Change from settings panel."
+		fi
+	fi
+fi
+valtmp=;
+grep -q "^c\[aw\]=\"\"$" "${insdir}ads.conf"
+if [ "${?}" = "0" ]; then
+	bb 15 16 17 18 19 20
+	echo "Enter the relative web path you will grow your project from:"
 	until [ -n "${valtmp}" ]; do
 		vared -cp " > " valtmp
 	done
-	sed -i '' -e "s/^c\[un\]=\"\"$/c\[un\]=\"${valtmp//\//\\/}\"/" "${insdir}/ads.conf"
+	valtmp="${valtmp%/}/"
+	valtmp="${valtmp#/}"
+	sed -i '' -e "s/^c\[aw\]=\"\"$/c\[aw\]=\"${valtmp//\//\\/}\"/" "${insdir}ads.conf"
 fi
-#############################################
-echo "ITS NOT READY OK!!! GIVE ME A SEC!!!"
+valtmp=;
+grep -q "^c\[in\]=\"\"$" "${insdir}ads.conf"
+if [ "${?}" = "0" ]; then
+	bb 21 22 23 24
+	echo "Enter the base URL:"
+	until [ -n "${valtmp}" ]; do
+		vared -cp " > " valtmp
+	done
+	valtmp="${valtmp%/}/"
+	sed -i '' -e "s/^c\[in\]=\"\"$/c\[in\]=\"${valtmp//\//\\/}\"/" "${insdir}ads.conf"
+fi
 sed -i '' -e "s/^f=0$/f=1/" "${prfx}/bin/ads"
-exit 0
+echo "Now you should be good to go. Run \033[1mads\033[0m to begin."
+bb 28 25
