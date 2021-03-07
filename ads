@@ -1071,7 +1071,7 @@ function mklink() {
 		return
 	fi
 	rtra="${mv[@]//\ /\\ }"
-	mv[0]="$(realpath "${mv[0]}")"
+	mv[0]="$(echo "${mv[0]:a}" | sed -e "s/\\\(/\(/g" -e "s/\\\)/\)/g")"
 	[[ "${mv[1]}" = *.gif ]] || mv[1]="${mv[1]}.gif"
 	if [ -f "${c[op]}${mv[1]}" ]; then
 		read -sq "yn?File exists in output path. Overwrite? (y/N) "
@@ -1157,7 +1157,7 @@ function mkmini() {
 		fi
 	fi
 	if [ ${#mv[@]} = 4 ]; then
-			mv[0]="$(realpath "${mv[0]}")"
+			mv[0]="$(echo "${mv[0]:a}" | sed -e "s/\\\(/\(/g" -e "s/\\\)/\)/g")"
 			if [[ "${mv[3]}" = [eE] ]]; then
 				ffmpeg -nostdin -hide_banner -loglevel error -y -i "${mv[0]}" -ss "${mv[2]}" -vf "scale=w=256:h=144:force_original_aspect_ratio=decrease,pad=256:144:(ow-iw)/2:(oh-ih)/2" -r 18 "${c[op]}${mv[1]}"
 			elif [[ "${mv[2]}" =~ "^[0-9.:]*$" && "${mv[3]}" =~ "^[0-9.:]*$" ]]; then
@@ -1184,7 +1184,7 @@ function mkmini() {
 }
 function mkmncp() {
 	[ ! -d "${c[ws]}${mv[2]}" ] && mkdir -p "${c[ws]}${mv[2]}"
-	cp "${c[at]}${mszo[${mnsz}]%:*}${c[mnpg]}" "$(realpath "${c[ws]}${mv[2]%/index.*}/index.htm")"
+	cp "${c[at]}${mszo[${mnsz}]%:*}${c[mnpg]}" "${c[ws]}${mv[2]%/index.*}/index.htm"
 	for i in {0..$(expr ${#gi[@]} - 1)}; do
  		sv="gfmnlk${i}"
 		declare "${sv}"="${c[in]}${mv[3]}/${gi[${i}]}"
@@ -1318,7 +1318,7 @@ function mvgifs() {
 		mv[1]="${c[op]}"
 	else
 		if [ -d "${mv[1]}" ]; then
-			mv[1]="${mv[1]:a}"
+			mv[1]="$(echo "${mv[1]:a}" | sed -e "s/\\\(/\(/g" -e "s/\\\)/\)/g")"
 		else
 			read -sq "yn?Path containing gifs not found. Reenter (y) or abort? (N) "
 			printf "\n"
