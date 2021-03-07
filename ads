@@ -93,7 +93,6 @@ function e() {
 			${k[BB]%:*}) abbm ;;
 			${k[NM]%:*}) arem ;;
 			${k[EX]%:*}) aexp ;;
-			z) is ;;
 			*) ;;
 		esac
 	done
