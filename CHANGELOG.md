@@ -9,4 +9,4 @@
 - Better local file handling, error catching for uploader
 - Misc minor usage rails to avoid errors
 
-[v0.α5]: https://github.com/kees-/ads/releases/tag/v0.%CE%B14
+[v0.α5]: https://github.com/kees-/ads/releases/tag/v0.%CE%B15
