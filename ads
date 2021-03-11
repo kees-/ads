@@ -1,21 +1,20 @@
 #!/usr/bin/env zsh
 ########### todo ###########
-# install and setup script
-# output moved gif names
+#
 ########## bugfix ##########
-# gate unset options
+# settings only 1 at a time?
 ############################
 
 set -m
 setopt ksh_arrays
 # is ads setup and ready to use?
 f=0
-if [ "${f}" = "0" ]; then
+declare -A c
+c[ad]=;
+if [ "${f}" = "0" -o -z "${c[ad]}" ]; then
 	echo "The program does not appear to be set up yet.\nTry running ads_install before use."
 	exit 1
 fi
-declare -A c
-c[ad]=;
 . "${c[ad]}ads.conf"
 . "${c[ad]}adt.conf"
 . "${c[ad]}klib.conf"
@@ -66,6 +65,7 @@ function e() {
 	printf "${stq}Welcome To The American Dream Suite. Unfortunately you will die.${noc} "
 	ph
 	printf "\n"
+	
 	s+=($(cat "${c[ad]}q.conf"))
 	printf "" | tee "${c[ad]}q.conf"
 	q=1
@@ -105,6 +105,28 @@ function bb() {
 		done
 		printf "\n"
 	fi
+}
+function cv() {
+	cv=()
+	for v in ${@}; do
+		if [ -z "${c[${v}]}" ] && cv+=("${v}")
+	done
+	if [ "${#cv[@]}" -eq 1 ]; then
+		echo "The following necessary option is unset:"
+		echo "    ${stq}${n[${cv[0]}]}${noc}"
+		echo "  Adjust in the settings panel to proceed."
+		q=1
+		return 1
+	elif [ "${#cv[@]}" -gt 1 ]; then
+		echo "The following necessary options are unset:"
+		for v in ${cv[@]}; do
+			echo "    ${stq}${n[${v}]}${noc}"
+		done
+		echo "  Adjust in the settings panel to proceed."
+		q=1
+		return 1
+	fi
+	return 0
 }
 function kt() {
 	case $(ce 5) in
@@ -214,6 +236,8 @@ function arem() {
 function blnd() {
 	q=0
 	rtri="blnd"
+	cv ws bl
+	if [ "${?}" -eq 1 ] && return
 	if [ "${w[0]}" != "1" -a "${w[1]}" != "1" ]; then
 		echo "${puq}It is time to sleep$([ "${x[4]}" = "1" ] && echo " again")\n  You walk into the bedroom${noc}"
 	elif [ "${w[0]}" != "1" -a "${w[1]}" = "1" ]; then
@@ -231,6 +255,8 @@ function blnd() {
 function cnct() {
 	q=0
 	rtri="cnct"
+	cv ws sl sa
+	if [ "${?}" -eq 1 ] && return
 	if [ "${w[0]}" != "5" -a "${w[5]}" != "1" ]; then
 		echo "${whq}Welcome to the kitchen\n  It seems quiet here${noc}"
 	elif [ "${w[0]}" != "5" -a "${w[5]}" = "1" ]; then
@@ -246,6 +272,8 @@ function cnct() {
 function cpkl() {
 	q=0
 	rtri="cpkl"
+	cv ws sn se
+	if [ "${?}" -eq 1 ] && return
 	if [ "${w[0]}" != "5" -a "${w[5]}" != "1" ]; then
 		echo "${whq}Welcome to the kitchen\n  It is time to eat${noc}"
 	elif [ "${w[0]}" != "5" -a "${w[5]}" = "1" ]; then
@@ -263,6 +291,8 @@ function cpkl() {
 function cppg() {
 	q=0
 	rtri="cppg"
+	cv ws sn sk sp
+	if [ "${?}" -eq 1 ] && return
 	if [ "${w[0]}" != "5" -a "${w[5]}" != "1" ]; then
 		echo "${whq}Welcome to the kitchen\n  The light is soft in this room\n  It is your favorite to be here${noc}"
 	elif [ "${w[0]}" != "5" -a "${w[5]}" = "1" ]; then
@@ -321,6 +351,8 @@ function lnkp() {
 function mini() {
 	q=0
 	rtri="mini"
+	cv op
+	if [ "${?}" -eq 1 ] && return
 	if [ "${w[0]}" != "1" -a "${w[1]}" != "1" ]; then
 		echo "${puq}Welcome to the bedroom\n  Your alarm clock is blinking${noc}"
 	elif [ "${w[0]}" != "1" -a "${w[1]}" = "1" ]; then
@@ -336,6 +368,8 @@ function mini() {
 function mlnk() {
 	q=0
 	rtri="mlnk"
+	cv op
+	if [ "${?}" -eq 1 ] && return
 	if [ "${w[0]}" != 2 -a "${w[2]}" = 1 ]; then
 		echo "${blq}You walk back into the living room and see the TV\n  $([ "$(ct)" = "heads" ] && echo "${n1[3]}" || echo "${n2[3]}") is playing${noc}"
 	elif [ "${w[0]}" != 2 -a "${w[2]}" != 1 ]; then
@@ -351,6 +385,8 @@ function mlnk() {
 function mlpg() {
 	q=0
 	rtri="mlpg"
+	cv ws in
+	if [ "${?}" -eq 1 ] && return
 	if [ "${w[0]}" != "2" -a "${w[2]}" != "1" ]; then
 		echo "${blq}Welcome to the living room\n  You pick up a coffee table book at random${noc}"
 	elif [ "${w[0]}" != "2" -a "${w[2]}" = "1" ]; then
@@ -431,6 +467,8 @@ function mnip() {
 function mnpg() {
 	q=0
 	rtri="mnpg"
+	cv at ws in
+	if [ "${?}" -eq 1 ] && return
 	if [ "${w[0]}" != "1" -a "${w[1]}" != "1" ]; then
 		echo "${puq}Welcome to the bedroom\n  You pick a random book up off the $([ "$(ct)" = "heads" ] && echo "shelf" || echo "floor")${noc}"
 	elif [ "${w[0]}" != "1" -a "${w[1]}" = "1" ]; then
@@ -446,6 +484,8 @@ function mnpg() {
 function mvgf() {
 	q=0
 	rtri="mvgf"
+	cv ws op
+	if [ "${?}" -eq 1 ] && return
 	if [ "${w[0]}" != "3" -a "${w[3]}" != "1" ]; then
 		echo "${yeq}You stop for a moment at the door$([ "$(ce 4)" = "4" ] && echo "\n  You have some things to do")\n  Looking out the windows $(ol)${noc}"
 	elif [ "${w[0]}" != "3" -a "${w[3]}" = "1" ]; then
@@ -461,6 +501,8 @@ function mvgf() {
 function rlnk() {
 	q=0
 	rtri="rlnk"
+	cv ws sl sa in
+	if [ "${?}" -eq 1 ] && return
 	if [ "${w[0]}" != "5" -a "${w[5]}" != "1" ]; then
 		echo "${whq}Welcome to the kitchen\n  Some dishes are piling up from an earlier day\n  Nothing unmanageable${noc}"
 	elif [ "${w[0]}" != "5" -a "${w[5]}" = "1" -a "${x[5]}" != "1" ]; then
@@ -500,11 +542,8 @@ function sets() {
 function upld() {
 	q=0
 	rtri="upld"
-	if [ -z "${c[un]}" -o -z "${c[us]}" ]; then
-		echo "One or both of your SSH web credentials are unconfigured.\nAdjust them in the settings panel to proceed."
-		q=1
-		return
-	fi
+	cv un us in ws aw
+	if [ "${?}" -eq 1 ] && return
 	if [ "${w[0]}" != 4 ]; then
 		echo "${grq}You use the toilet$([ "${w[4]}" = 1 ] && echo " again")${noc}"
 	elif [ "${w[0]}" = 4 ]; then
@@ -521,7 +560,19 @@ function upld() {
 	if [ "${yn}" = "y" ]; then
 		s=($(printf "%s\n" "${s[@]}" | sort -u))
 		for i in "${s[@]}"; do
-			rsync -vat --exclude=.DS_Store --delete --no-perms --rsync-path="mkdir -p ${c[aw]}/${i} && rsync" "${c[ws]}${i}/" "${c[un]}@${c[us]}:${c[aw]}/${i}"
+			if [ ! -d "${c[ws]}${i}" ]; then
+				echo "One or more inputs not found. Retry."
+				q=1
+				return
+			fi
+		done
+		for i in "${s[@]}"; do
+			if [ -d "${c[ws]}${i}" ]; then
+				echo "${stq}${i}${noc}"
+				rsync -vat --exclude=.DS_Store --delete --no-perms --rsync-path="mkdir -p ${c[aw]}/${i} && rsync" "${c[ws]}${i}/" "${c[un]}@${c[us]}:${c[aw]}/${i}"
+			else
+				echo "Error: folder ${stq}${i}${noc} was not found."
+			fi
 		done
 		[ "${?}" = 0 ] && echo "  ${req}Departed rooms are ready for housekeeping${noc}" || echo "Upload appears to have encountered an error"
 		bb 32
@@ -546,7 +597,19 @@ function upld() {
 		rtra="${mv[@]//\ /\\ }"
 		rms
 		for i in "${mv[@]}"; do
-			rsync -vat --exclude=.DS_Store --delete --no-perms --rsync-path="mkdir -p ${c[aw]}/${i} && rsync" "${c[ws]}${i}/" "${c[un]}@${c[us]}:${c[aw]}/${i}"
+			if [ ! -d "${c[ws]}${i}" ]; then
+				echo "One or more inputs not found. Retry."
+				q=1
+				return
+			fi
+		done
+		for i in "${mv[@]}"; do
+			if [ -d "${c[ws]}${i}" ]; then
+				echo "${stq}${i}${noc}"
+				rsync -vat --exclude=.DS_Store --delete --no-perms --rsync-path="mkdir -p ${c[aw]}/${i} && rsync" "${c[ws]}${i}/" "${c[un]}@${c[us]}:${c[aw]}/${i}"
+			else
+				echo "Error: directory ${stq}${i}${noc} was not found."
+			fi
 		done
 		[ "${?}" = 0 ] && echo "  ${req}Departed rooms are ready for housekeeping${noc}" || echo "Upload appears to have encountered an error"
 	fi
@@ -782,8 +845,9 @@ function chpths() {
 				esac
 				echo "Adjust the selected option:"
 				vared -cp "$(echo -ne "\xf0\x9f\x94\x93") > " valtmp
-				if [ "${cwcbnd[${i}]}" = "ad" -o "${cwcbnd[${i}]}" = "op" -a "${cwcbnd[${i}]}" = "ws" ] && valtmp="${valtmp%/}/"
+				if [ "${cwcbnd[${i}]}" = "ad" -o "${cwcbnd[${i}]}" = "op" -o "${cwcbnd[${i}]}" = "ws" ] && valtmp="${valtmp%/}/"
 				sed -i '' -e "$(grep -n "c\[${cptbnd[${i}]}\]=" "${c[ad]}ads.conf" | cut -f1 -d:)s/\"${c[${cptbnd[${i}]}]//\//\\/}\"/\"${valtmp//\//\\/}\"/" "${c[ad]}ads.conf"
+				c[${cptbnd[${i}]}]="${valtmp}"
 				. "${c[ad]}ads.conf"
 				p1=0
 				chpths
@@ -1060,7 +1124,7 @@ function mklink() {
 		echo "${blq}  You look from the tv $(lv)${noc}"
 		return
 	fi
-	rms
+	rtra="${mv[@]//\ /\\ }"
 	if [ ${#mv[@]} != 4 -a ${#mv[@]} != 5 ]; then
 		read -sq "yn?Invalid input. Reenter (y) or abort? (N) "
 		printf "\n"
@@ -1070,8 +1134,8 @@ function mklink() {
 		fi
 		return
 	fi
-	rtra="${mv[@]//\ /\\ }"
-	mv[0]="$(echo "${mv[0]:a}" | sed -e "s/\\\(/\(/g" -e "s/\\\)/\)/g")"
+	mv[0]="$(echo "${mv[0]:A}" | sed -e "s/\\\(/\(/g" -e "s/\\\)/\)/g")"
+	rms
 	[[ "${mv[1]}" = *.gif ]] || mv[1]="${mv[1]}.gif"
 	if [ -f "${c[op]}${mv[1]}" ]; then
 		read -sq "yn?File exists in output path. Overwrite? (y/N) "
@@ -1085,9 +1149,9 @@ function mklink() {
 		[[ "${mv[2]}" = .* ]] && mv[2]="0${mv[2]}"
 		[[ "${mv[3]}" = .* ]] && mv[2]="0${mv[3]}"
 		if [[ "${mv[3]}" = [eE] ]]; then
-			ffmpeg -nostdin -hide_banner -loglevel error -y -i "${mv[0]}" -ss "${mv[2]}" -vf scale=480:-1 -r 18 "${c[op]}${mv[1]}"
+			ffmpeg -nostdin -hide_banner -loglevel error -y -i "/${mv[0]}" -ss "${mv[2]}" -vf scale=480:-1 -r 18 "${c[op]}${mv[1]}"
 		elif [[ "${mv[2]}" =~ "^[0-9.:]*$" && "${mv[3]}" =~ "^[0-9.:]*$" ]]; then
-			ffmpeg -nostdin -hide_banner -loglevel error -y -i "${mv[0]}" -ss "${mv[2]}" -to "${mv[3]}" -vf scale=480:-1 -r 18 "${c[op]}${mv[1]}"
+			ffmpeg -nostdin -hide_banner -loglevel error -y -i "/${mv[0]}" -ss "${mv[2]}" -to "${mv[3]}" -vf scale=480:-1 -r 18 "${c[op]}${mv[1]}"
 		else
 			read -sq "yn?Unrecognized time input. Reenter (y) or abort? (N) "
 			printf "\n"
@@ -1102,9 +1166,9 @@ function mklink() {
 		[[ "${mv[3]}" = .* ]] && mv[2]="0${mv[3]}"
 		[[ "${mv[4]}" = .* ]] && mv[2]="0${mv[4]}"
 		if [[ "${mv[4]}" = [eE] ]]; then
-			ffmpeg -nostdin -hide_banner -loglevel error -y -i "${mv[0]}" -ss "${mv[3]}" -vf scale=${mv[2]}:-1 -r 18 "${c[op]}${mv[1]}"
+			ffmpeg -nostdin -hide_banner -loglevel error -y -i "/${mv[0]}" -ss "${mv[3]}" -vf scale=${mv[2]}:-1 -r 18 "${c[op]}${mv[1]}"
 		elif [[ "${mv[3]}" =~ "^[0-9.:]*$" && "${mv[4]}" =~ "^[0-9.:]*$" ]]; then
-			ffmpeg -nostdin -hide_banner -loglevel error -y -i "${mv[0]}" -ss "${mv[3]}" -to "${mv[4]}" -vf scale=${mv[2]}:-1 -r 18 "${c[op]}${mv[1]}"
+			ffmpeg -nostdin -hide_banner -loglevel error -y -i "/${mv[0]}" -ss "${mv[3]}" -to "${mv[4]}" -vf scale=${mv[2]}:-1 -r 18 "${c[op]}${mv[1]}"
 		else
 			read -sq "yn?Unrecognized time input. Reenter (y) or abort? (N) "
 			printf "\n"
@@ -1157,11 +1221,12 @@ function mkmini() {
 		fi
 	fi
 	if [ ${#mv[@]} = 4 ]; then
-			mv[0]="$(echo "${mv[0]:a}" | sed -e "s/\\\(/\(/g" -e "s/\\\)/\)/g")"
+			mv[0]="$(echo "${mv[0]:A}" | sed -e "s/\\\(/\(/g" -e "s/\\\)/\)/g")"
+			rms
 			if [[ "${mv[3]}" = [eE] ]]; then
-				ffmpeg -nostdin -hide_banner -loglevel error -y -i "${mv[0]}" -ss "${mv[2]}" -vf "scale=w=256:h=144:force_original_aspect_ratio=decrease,pad=256:144:(ow-iw)/2:(oh-ih)/2" -r 18 "${c[op]}${mv[1]}"
+				ffmpeg -nostdin -hide_banner -loglevel error -y -i "/${mv[0]}" -ss "${mv[2]}" -vf "scale=w=256:h=144:force_original_aspect_ratio=decrease,pad=256:144:(ow-iw)/2:(oh-ih)/2" -r 18 "${c[op]}${mv[1]}"
 			elif [[ "${mv[2]}" =~ "^[0-9.:]*$" && "${mv[3]}" =~ "^[0-9.:]*$" ]]; then
-				ffmpeg -nostdin -hide_banner -loglevel error -y -i "${mv[0]}" -ss "${mv[2]}" -to "${mv[3]}" -vf "scale=w=256:h=144:force_original_aspect_ratio=decrease,pad=256:144:(ow-iw)/2:(oh-ih)/2" -r 18 "${c[op]}${mv[1]}"
+				ffmpeg -nostdin -hide_banner -loglevel error -y -i "/${mv[0]}" -ss "${mv[2]}" -to "${mv[3]}" -vf "scale=w=256:h=144:force_original_aspect_ratio=decrease,pad=256:144:(ow-iw)/2:(oh-ih)/2" -r 18 "${c[op]}${mv[1]}"
 			else
 				read -sq "yn?Unrecognized time input. Reenter (y) or abort? (N) "
 				printf "\n"
@@ -1258,43 +1323,53 @@ function mngfpg() {
 		fi
 }
 function mvgfxa() {
+	fgf=;
+	lgf=;
 	for mgx0 in {2..$(expr ${#mv[@]} - 1)}; do
 		for mgx1 in {a..c} {e..z}; do
 			[ ! -f "/${mv[1]}/${mv[${mgx0}]}" ] && break
 			if [ ! -f "${c[ws]}${mv[0]}/a${mgx1}.gif" ]; then
+				[ -z "${fgf}" ] && fgf="a${mgx1}"
 				mv -n "/${mv[1]}/${mv[${mgx0}]}" "${c[ws]}${mv[0]}/a${mgx1}.gif"
+				lgf="a${mgx1}"
 				continue
 			fi
 		done
 	done
 	printf "\n"
+	[ "${#mv[@]}" -eq 3 ] && echo "${req}The new guest at${noc} ${stq}${(U)fgf}${noc} ${req}has arrived${noc}" || echo "${req}The new guests at${noc} ${stq}${(U)fgf}${noc} ${req}to${noc} ${stq}${(U)lgf}${noc} ${req}have arrived${noc}"
 	bb 56
 	read -sq "yn?Add path to upload queue? (y/N) "
 	printf "\n"
 	if [ "${yn}" = "y" ]; then
 		s+=("${mv[0]}")
 	else
-		echo "Be advised to safely add ${stq}${mv[0]}${noc} (containing new $([ "${#mv[@]}" -ge 4 ] && echo gifs || echo gif))\nto your web host either with provided tool or external program."
+		echo "Be advised to safely add ${stq}${mv[0]}${noc} (containing new gif$([ "${#mv[@]}" -ge 4 ] && echo s))\nto your web host either with provided tool or external program."
 	fi
 }
 function mvgfxc() {
+	fgf=;
+	lgf=;
 	for mgx0 in {2..$(expr ${#mv[@]} - 1)}; do
 		for mgx1 in {a..z}; do
 			[ ! -f "/${mv[1]}/${mv[${mgx0}]}" ] && break
 			if [ ! -f "${c[ws]}${mv[0]}/${i}${mgx1}.gif" ]; then
+				[ -z "${fgf}" ] && fgf="${i}${mgx1}"
 				mv -n "/${mv[1]}/${mv[${mgx0}]}" "${c[ws]}${mv[0]}/${i}${mgx1}.gif"
+				lgf="${i}${mgx1}"
 				continue 1
 			fi
 		done
 	done
 	printf "\n"
+	[ "${#mv[@]}" -eq 3 ] && echo "${req}The new guest at${noc} ${stq}${(U)fgf}${noc} ${req}has arrived${noc}" || echo "${req}The new guests at${noc} ${stq}${(U)fgf}${noc} ${req}to${noc} ${stq}${(U)lgf}${noc} ${req}have arrived${noc}"
 	bb 56
 	read -sq "yn?Add path to upload queue? (y/N) "
 	printf "\n"
 	if [ "${yn}" = "y" ]; then
 		s+=("${mv[0]}")
 	else
-		echo "Be advised to safely add ${stq}${mv[0]}${noc} (containing new $([ "${#mv[@]}" -ge 4 ] && echo gifs || echo gif))\nto your web host either with provided tool or external program."
+		echo "Be advised to safely add ${stq}${mv[0]}${noc} (containing new gif$([ "${#mv[@]}" -ge 4 ] && echo s))\nto your web host either with provided tool or external program."
 	fi
 }
 function mvgifs() {
@@ -1318,7 +1393,7 @@ function mvgifs() {
 		mv[1]="${c[op]}"
 	else
 		if [ -d "${mv[1]}" ]; then
-			mv[1]="$(echo "${mv[1]:a}" | sed -e "s/\\\(/\(/g" -e "s/\\\)/\)/g")"
+			mv[1]="$(echo "${mv[1]:A}" | sed -e "s/\\\(/\(/g" -e "s/\\\)/\)/g")"
 		else
 			read -sq "yn?Path containing gifs not found. Reenter (y) or abort? (N) "
 			printf "\n"
@@ -1353,7 +1428,7 @@ function mvgifs() {
 			done
 			if [ "${mvrnlp}" -ge "$(expr ${#mv[@]} - 2)" ]; then
 				printf "\n"
-				echo -n "${req}Add $([ ${#mv[@]} -gt 3 ] && echo gifs || echo gif) to A Suite?${noc} (y/N) "
+				echo -n "${req}Add gif$([ ${#mv[@]} -gt 3 ] && echo s) to A Suite?${noc} (y/N) "
 				read -sq yn
 					if [ "${yn}" = "y" ]; then
 						mvgfxa
@@ -1378,7 +1453,7 @@ function mvgifs() {
 					[ ! -f "${c[ws]}${mv[0]}/${i}${i2}.gif" ] && ((mvrnlp++))
 				done
 				if [ "${mvrnlp}" -ge "$(expr "${#mv[@]}" - 2)" ]; then
-					echo -n "\n${req}Add gif$([ ${#mv[@]} -gt 3 ] && echo "s") to $(echo ${(U)i}) Suite?${noc} (y/N) "
+					echo -n "\n${req}Add gif$([ ${#mv[@]} -gt 3 ] && echo s) to $(echo ${(U)i}) Suite?${noc} (y/N) "
 					read -sq yn
 						if [ "${yn}" = "y" ]; then
 							mvgfxc
@@ -1789,7 +1864,7 @@ function sshcrd() {
 	p1=1
 	clear
 	echo "${stq}Internet options${noc}"
-	"The following should not be edited until targeting new locations online for additional sites. User assumes risk!" | fold -sw $(expr ${COLUMNS} - 4) | sed "s/ *$//"
+	echo "The following should not be edited until targeting new locations online for additional sites. User assumes risk!" | fold -sw $(expr ${COLUMNS} - 4) | sed "s/ *$//"
 	for i in {1..$(expr ${#cwcbnd[@]} - 1)}; do
 		echo "  ${ulq}${i}${noc} ${n[${cwcbnd[${i}]}]}:"
 		echo "    \033[47m${c[${cwcbnd[${i}]}]}\033[0m"
@@ -1815,8 +1890,9 @@ function sshcrd() {
 				esac
 				echo "Adjust the selected option:"
 				vared -cp "$(echo -ne "\xf0\x9f\x94\x93") > " valtmp
-				if [ "${cwcbnd[${i}]}" = "in" -o "${cwcbnd[${i}]}" = "in" ] && valtmp="${valtmp%/}/"
+				if [ "${cwcbnd[${i}]}" = "in" -o "${cwcbnd[${i}]}" = "aw" ] && valtmp="${valtmp%/}/"
 				sed -i '' -e "$(grep -n "c\[${cwcbnd[${i}]}\]=" "${c[ad]}ads.conf" | cut -f1 -d:)s/\"${c[${cwcbnd[${i}]}]//\//\\/}\"/\"${valtmp//\//\\/}\"/" "${c[ad]}ads.conf"
+				c[${cwcbnd[${i}]}]="${valtmp}"
 				. "${c[ad]}ads.conf"
 				p1=0
 				sshcrd
