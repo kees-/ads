@@ -1,8 +1,9 @@
 #!/usr/bin/env zsh
 ########### todo ###########
-#
+# preview pages with xstack!
 ########## bugfix ##########
-# settings only 1 at a time?
+# better error handling mvgf
+# reorder ovrwrt mnspg make
 ############################
 
 set -m
@@ -34,12 +35,12 @@ declare -a s
 #	5: kitchen
 w=(0 0 0 0 0 0)
 # x tracks misc counters
-#	0: EAT
+#	0: EAT	6: eatAnnounce
 #	1: display link box
 #	2-3: counter for connector hotel flavor
 #	4: slept
 #	5: dishes
-x=(0 0 0 0 0)
+x=(0 0 0 0 0 0 0)
 # names news channels on initialization
 n1=($(cat /dev/urandom | env LC_CTYPE=C tr -dc 'BCDFGHJKLMNPRSTVWXYZ' | fold -w 1 | head -n 1) $(cat /dev/urandom | env LC_CTYPE=C tr -dc 'aeiou' | fold -w 1 | head -n 1) $(cat /dev/urandom | env LC_CTYPE=C tr -dc 'bcdfghjklmnpqrstvwxyz' | fold -w 1 | head -n 1))
 n1[3]=$(IFS=; echo "${n1[*]} News")
@@ -65,7 +66,6 @@ function e() {
 	printf "${stq}Welcome To The American Dream Suite. Unfortunately you will die.${noc} "
 	ph
 	printf "\n"
-	
 	s+=($(cat "${c[ad]}q.conf"))
 	printf "" | tee "${c[ad]}q.conf"
 	q=1
@@ -163,8 +163,8 @@ function qf() {
 		q=0
 	else
 		bb 27
-		read -sq "yn?Upload queue has items waiting (${#s[@]}). Quit? (y/N) "
 		s=($(printf "%s\n" "${s[@]}" | sort -u))
+		read -sq "yn?Upload queue has items waiting (${#s[@]}). Quit? (y/N) "
 		printf "\n"
 		if [ "${yn}" = "y" ]; then
 			read -sq "yn?Save queue for next session (y) or abandon? (N) "
@@ -261,8 +261,10 @@ function cnct() {
 		echo "${whq}Welcome to the kitchen\n  It seems quiet here${noc}"
 	elif [ "${w[0]}" != "5" -a "${w[5]}" = "1" ]; then
 		echo "${whq}You walk back to the kitchen$([ "$(ct)" = "heads" ] && echo " and go over to the little table")\n  The appliances sitting on the counter look a little out of place${noc}"
-	elif [ "${w[0]}" = "5" ]; then
+	elif [ "${w[0]}" = "5" -a "${x[0]}" = "0" ]; then
 		echo "${whq}Later you could eat something${noc}"
+	elif [ "${w[0]}" = "5" -a "${x[0]}" = "1" ]; then
+		echo "${whq}You are still full${noc}"
 	fi
 	bb 48 49 37 33
 	echo "    Usage: ${stq}path-to-linking-page path-to-destination-page${noc}"
@@ -280,8 +282,11 @@ function cpkl() {
 		echo "${whq}You walk back to the kitchen\n  Having a meal is not as easy anymore${noc}"
 	elif [ "${w[0]}" = "5" -a "${x[0]}" = "1" ]; then
 		echo "${whq}It was good${noc}"
-	elif [ "${w[0]}" = "5" -a "${x[0]}" != "1" ]; then
-		echo "${whq}It in front of you${noc}"
+	elif [ "${w[0]}" = "5" -a "${x[0]}" != "1" -a "${x[6]}" = "1" ]; then
+		echo "${whq}It is in front of you${noc}"
+	elif [ "${w[0]}" = "5" -a "${x[0]}" != "1" -a "${x[6]}" != "1" ]; then
+		echo "${whq}It is time to eat${noc}"
+		x[6]=1
 	fi
 	bb 40 41 42 37 33
 	echo "    Usage: ${stq}directory-path-containing-page${noc}"
@@ -528,7 +533,12 @@ function sets() {
 	bb 0 1
 	while [ "${p}" = "1" ]; do
 		printf "\r$(echo -ne "\xf0\x9f\x9b\xb7") > "
-		read -rsk1 i
+		if [ "${scs[0]}" = "1" ]; then
+			i="${scs[1]}"
+			scs[0]=0
+		else
+			read -rsk i
+		fi
 		case ${i} in
 			${k[quit]%:*}) qs ;;
 			${k[Skeybnde]%:*}) skyand ;;
@@ -845,12 +855,12 @@ function chpths() {
 				esac
 				echo "Adjust the selected option:"
 				vared -cp "$(echo -ne "\xf0\x9f\x94\x93") > " valtmp
-				if [ "${cwcbnd[${i}]}" = "ad" -o "${cwcbnd[${i}]}" = "op" -o "${cwcbnd[${i}]}" = "ws" ] && valtmp="${valtmp%/}/"
+				[ "${cwcbnd[${i}]}" = "ad" -o "${cwcbnd[${i}]}" = "op" -o "${cwcbnd[${i}]}" = "ws" ] && valtmp="${valtmp%/}/"
 				sed -i '' -e "$(grep -n "c\[${cptbnd[${i}]}\]=" "${c[ad]}ads.conf" | cut -f1 -d:)s/\"${c[${cptbnd[${i}]}]//\//\\/}\"/\"${valtmp//\//\\/}\"/" "${c[ad]}ads.conf"
 				c[${cptbnd[${i}]}]="${valtmp}"
 				. "${c[ad]}ads.conf"
 				p1=0
-				chpths
+				scs=(1 "${k[Spaths]%:*}")
 				return
 			fi
 		done
@@ -888,7 +898,7 @@ function cnctpg() {
 	elif [ ${#mv[@]} = 2 ]; then
 		rms
 		for i in {0..1}; do
-			if [[ "${mv[${i}]}" =~ /*.htm* ]]; then
+			if [[ "${mv[${i}]%l}" = */*.htm ]]; then
 				mv[$(expr ${i} + 2)]="${mv[${i}]##*/}"
 				mv[${i}]="${mv[${i}]%/*.htm*}"
 			else
@@ -897,11 +907,10 @@ function cnctpg() {
 		done
 		if [ ! -f "${c[ws]}${mv[0]}/${mv[2]}" ]; then
 			read -sq "yn?Page to contain link not found. Reenter (y) or abort? (N) "
+			printf "\n"
 			if [ "${yn}" = "y" ]; then
 				r=1
 				cnctpg
-			else
-				printf "\n"
 			fi
 			return
 		fi
@@ -940,7 +949,7 @@ function kllcap() {
 			mv[0]="${mv[0]%/index.html}"
 		fi
 		if [ ! -f "${c[ws]}/${mv[0]}/index.htm" ]; then
-			read -sq "yn?Page to contain new link not found. Reenter (y) or abort? (N) "
+			read -sq "yn?Page to remove link not found. Reenter (y) or abort? (N) "
 			if [ "${yn}" = "y" ]; then
 				kllcap
 				return
@@ -1291,7 +1300,7 @@ function mngfpg() {
 		return
 	fi
 	until [ ${#gi[@]} = "$(echo ${mszo[${mnsz}]} | cut -f2 -d:)" ]; do
-		echo "Additional input required ($(expr $(echo ${mszo[${mnsz}]} | cut -f2 -d:) - ${#gi[@]}) more gif$([ $(expr $(echo ${mszo[${mnsz}]} | cut -f2 -d:) - ${#gi[@]}) -gt 1 ] && echo s)):"
+		echo "Additional input required ($(expr $(echo ${mszo[${mnsz}]} | cut -f2 -d:) - ${#gi[@]}) more gif$([ $(expr $(echo ${mszo[${mnsz}]} | cut -f2 -d:) - ${#gi[@]}) -gt 1 ] && echo "s")):"
 		gitm=;
 		vared -cap "$(echo -ne "\xf0\x9f\x93\x91") > " gitm
 		if [ ${#gitm[@]} -le $(expr $(echo ${mszo[${mnsz}]} | cut -f2 -d:) - ${#gi[@]}) ]; then
@@ -1344,7 +1353,7 @@ function mvgfxa() {
 	if [ "${yn}" = "y" ]; then
 		s+=("${mv[0]}")
 	else
-		echo "Be advised to safely add ${stq}${mv[0]}${noc} (containing new gif$([ "${#mv[@]}" -ge 4 ] && echo s))\nto your web host either with provided tool or external program."
+		echo "Be advised to safely add ${stq}${mv[0]}${noc} (containing new gif$([ "${#mv[@]}" -ge 4 ] && echo "s"))\nto your web host either with provided tool or external program."
 	fi
 }
 function mvgfxc() {
@@ -1369,7 +1378,7 @@ function mvgfxc() {
 	if [ "${yn}" = "y" ]; then
 		s+=("${mv[0]}")
 	else
-		echo "Be advised to safely add ${stq}${mv[0]}${noc} (containing new gif$([ "${#mv[@]}" -ge 4 ] && echo s))\nto your web host either with provided tool or external program."
+		echo "Be advised to safely add ${stq}${mv[0]}${noc} (containing new gif$([ "${#mv[@]}" -ge 4 ] && echo "s"))\nto your web host either with provided tool or external program."
 	fi
 }
 function mvgifs() {
@@ -1382,8 +1391,11 @@ function mvgifs() {
 	fi
 	vared -cap "$(echo -ne "\xe2\x9b\x85\xef\xb8\x8f") > " mv
 	rtra="${mv[@]//\ /\\ }"
-	if [ ${#mv[@]} = 0 ]; then
+	if [ ${#mv[@]} -eq 0 ]; then
 		echo "${yeq}  Your eyes darken briefly${noc}"
+		return
+	elif [ ${#mv[@]} -eq 1 ]; then
+		echo "Not enough inputs"
 		return
 	elif [ ${#mv[@]} -ge 27 ]; then
 		echo "Too many inputs"
@@ -1428,7 +1440,7 @@ function mvgifs() {
 			done
 			if [ "${mvrnlp}" -ge "$(expr ${#mv[@]} - 2)" ]; then
 				printf "\n"
-				echo -n "${req}Add gif$([ ${#mv[@]} -gt 3 ] && echo s) to A Suite?${noc} (y/N) "
+				echo -n "${req}Add gif$([ ${#mv[@]} -gt 3 ] && echo "s") to A Suite?${noc} (y/N) "
 				read -sq yn
 					if [ "${yn}" = "y" ]; then
 						mvgfxa
@@ -1453,7 +1465,7 @@ function mvgifs() {
 					[ ! -f "${c[ws]}${mv[0]}/${i}${i2}.gif" ] && ((mvrnlp++))
 				done
 				if [ "${mvrnlp}" -ge "$(expr "${#mv[@]}" - 2)" ]; then
-					echo -n "\n${req}Add gif$([ ${#mv[@]} -gt 3 ] && echo s) to $(echo ${(U)i}) Suite?${noc} (y/N) "
+					echo -n "\n${req}Add gif$([ ${#mv[@]} -gt 3 ] && echo "s") to $(echo ${(U)i}) Suite?${noc} (y/N) "
 					read -sq yn
 						if [ "${yn}" = "y" ]; then
 							mvgfxc
@@ -1861,6 +1873,7 @@ function remlnk() {
 	fi
 }
 function sshcrd() {
+	scs[0]=0
 	p1=1
 	clear
 	echo "${stq}Internet options${noc}"
@@ -1874,7 +1887,7 @@ function sshcrd() {
 	until [ "${p1}" = "0" ]; do
 		key=;
 		vared -cp "$(echo -ne "\xf0\x9f\x94\x92") > " key
-		if [ "${key}" = "q" -o -z "${key}" ]; then
+		if [ "${key}" = "${k[quit]%:*}" -o -z "${key}" ]; then
 			p1=0
 			sets
 			return
@@ -1890,18 +1903,19 @@ function sshcrd() {
 				esac
 				echo "Adjust the selected option:"
 				vared -cp "$(echo -ne "\xf0\x9f\x94\x93") > " valtmp
-				if [ "${cwcbnd[${i}]}" = "in" -o "${cwcbnd[${i}]}" = "aw" ] && valtmp="${valtmp%/}/"
+				[ "${cwcbnd[${i}]}" = "in" -o "${cwcbnd[${i}]}" = "aw" ] && valtmp="${valtmp%/}/"
 				sed -i '' -e "$(grep -n "c\[${cwcbnd[${i}]}\]=" "${c[ad]}ads.conf" | cut -f1 -d:)s/\"${c[${cwcbnd[${i}]}]//\//\\/}\"/\"${valtmp//\//\\/}\"/" "${c[ad]}ads.conf"
 				c[${cwcbnd[${i}]}]="${valtmp}"
 				. "${c[ad]}ads.conf"
 				p1=0
-				sshcrd
+				scs=(1 "${k[Ssshcreds]%:*}")
 				return
 			fi
 		done
 	done
 }
 function skyand() {
+	scs[0]=0
 	p=0
 	key=;
 	cnflct=0
@@ -1933,7 +1947,7 @@ function skyand() {
 						for i2 in ${mstkbd[@]}; do
 							if [ "${k[${i2}]%:*}" = "${keynew}" ]; then
 								if [ "${k[${i2}]%:*}" = "${k[${i}]%:*}" ]; then
-									skyand
+									scs=(1 "${k[Skeybnde]%:*}")
 									return
 								fi
 								printf "\n"
@@ -1947,7 +1961,7 @@ function skyand() {
 					for i2 in ${mstskb[@]} ${mstmds[@]} ${mstkbd[10]}; do
 						if [ "${k[${i2}]%:*}" = "${keynew}" ]; then
 							if [ "${k[${i2}]%:*}" = "${k[${i}]%:*}" ]; then
-								skyand
+								scs=(1 "${k[Skeybnde]%:*}")
 								return
 							fi
 							printf "\n"
@@ -1960,10 +1974,10 @@ function skyand() {
 					printf "\n"
 					sed -i '' -e "$(grep -n "k\[${i}\]" "${c[ad]}ads.conf" | cut -f1 -d:)s/k\[${i}\]=\"${key}/k\[${i}\]=\"${keynew}/" "${c[ad]}ads.conf"
 					k[${i}]="${keynew}:${k[${i}]#*:}"
-					skyand
+					scs=(1 "${k[Skeybnde]%:*}")
 					return
 				else
-					skyand
+					scs=(1 "${k[Skeybnde]%:*}")
 					return
 				fi
 			fi
@@ -1981,6 +1995,7 @@ function skyand() {
 	fi
 }
 function skybnd() {
+	scs[0]=0
 	p=0
 	key=;
 	cnflct=0
@@ -2004,6 +2019,12 @@ function skybnd() {
 				read -rsk1 "keynew?Enter a new key for ${k[${i}]#*:}: "
 				if [[ "${keynew}" == [A-Za-z0-9] ]]; then
 					if [ "${i}" = "quit" ]; then
+						if [[ "${keynew}" = [1-9] ]]; then
+							printf "\n"
+							echo "${k[${i}]#*:} cannot conflict with numerical selections"
+							cnflct=1
+							break
+						fi
 						for i2 in ${mstskb[@]} ${mstmds[@]}; do
 							if [ "${k[${i2}]%:*}" = "${keynew}" ]; then
 								printf "\n"
@@ -2016,7 +2037,7 @@ function skybnd() {
 					for i2 in ${mstkbd[@]} ${mstmds[@]}; do
 						if [ "${k[${i2}]%:*}" = "${keynew}" ]; then
 							if [ "${k[${i2}]%:*}" = "${k[${i}]%:*}" ]; then
-								skybnd
+								scs=(1 "${k[Skeybind]%:*}")
 								return
 							fi
 							printf "\n"
@@ -2028,10 +2049,10 @@ function skybnd() {
 					printf "\n"
 					sed -i '' -e "$(grep -n "k\[${i}\]" "${c[ad]}ads.conf" | cut -f1 -d:)s/k\[${i}\]=\"${key}/k\[${i}\]=\"${keynew}/" "${c[ad]}ads.conf"
 					k[${i}]="${keynew}:${k[${i}]#*:}"
-					skybnd
+					scs=(1 "${k[Skeybind]%:*}")
 					return
 				else
-					skybnd
+					scs=(1 "${k[Skeybind]%:*}")
 					return
 				fi
 			fi
