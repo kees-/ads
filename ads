@@ -1,14 +1,15 @@
 #!/usr/bin/env zsh
 ########### todo ###########
 # preview pages with xstack!
+# delete queuepos if missing
 ########## bugfix ##########
-# better error handling mvgf
-# reorder ovrwrt mnspg make
+# addlnk filled not notfound
+# reorder mnspg overwrt err
 ############################
 
 set -m
 setopt ksh_arrays
-# is ads setup and ready to use?
+# setup and ready to use?
 f=0
 declare -A c
 c[ad]=;
@@ -35,11 +36,11 @@ declare -a s
 #	5: kitchen
 w=(0 0 0 0 0 0)
 # x tracks misc counters
-#	0: EAT	6: eatAnnounce
+#	0: EAT	6: eatannounce
 #	1: display link box
 #	2-3: counter for connector hotel flavor
 #	4: slept
-#	5: dishes
+#	5: dishes 6: seendishes
 x=(0 0 0 0 0 0 0)
 # names news channels on initialization
 n1=($(cat /dev/urandom | env LC_CTYPE=C tr -dc 'BCDFGHJKLMNPRSTVWXYZ' | fold -w 1 | head -n 1) $(cat /dev/urandom | env LC_CTYPE=C tr -dc 'aeiou' | fold -w 1 | head -n 1) $(cat /dev/urandom | env LC_CTYPE=C tr -dc 'bcdfghjklmnpqrstvwxyz' | fold -w 1 | head -n 1))
@@ -514,11 +515,14 @@ function rlnk() {
 		echo "${whq}You walk back to the kitchen\n  Some dishes are piling up\n Nothing unmanageable${noc}"
 	elif [ "${w[0]}" != "5" -a "${w[5]}" = "1" -a "${x[5]}" = "1" ]; then
 		echo "${whq}You walk back to the kitchen\n  The clean sink clears your mind${noc}"
-	elif [ "${w[0]}" = "5" -a "${x[5]}" != "1" ]; then
+	elif [ "${w[0]}" = "5" -a "${x[6]}" != "1" ]; then
+		echo "${whq}Some dishes are in the sink${whq}"
+	elif [ "${w[0]}" = "5" -a "${x[5]}" != "1" -a "${x[6]}" = "1" ]; then
 		echo "${whq}They are all right there waiting${noc}"
 	elif [ "${w[0]}" = "5" -a "${x[5]}" = "1" ]; then
 		echo "${whq}The clean sink clears your mind${noc}"
 	fi
+	x[6]=1
 	bb 34 35 36 37 33
 	echo "    Usage: ${stq}path-to-linking-page${noc}"
 	[ "${m}" != "E" ] && echo "    Note: enter path relative to base web dir. Escape spaces in path.\n    ${ulq}/index.htm${noc} not required for pages named as such."
@@ -590,7 +594,7 @@ function upld() {
 		[ "${yn}" = "y" ] && s=()
 		printf "\n"
 	else
-		[ "${#s[@]}" -eq 0 ] && bb 26 28 29 37 33 || bb 29 37 33
+		[ "${#s[@]}" -eq 0 ] && bb 26 28 29 76 37 33 || bb 29 76 37 33
 		echo "    Usage: ${stq}directory-upload-path(s)${noc}"
 		[ "${m}" != "E" ] && echo "    Note: enter paths relative to base web dir. Accepts arbitrary args amount.\n    Local file tree from web dir base matches hosted equivalent."
 		mv=;
@@ -618,7 +622,7 @@ function upld() {
 				echo "${stq}${i}${noc}"
 				rsync -vat --exclude=.DS_Store --delete --no-perms --rsync-path="mkdir -p ${c[aw]}/${i} && rsync" "${c[ws]}${i}/" "${c[un]}@${c[us]}:${c[aw]}/${i}"
 			else
-				echo "Error: directory ${stq}${i}${noc} was not found."
+				echo "Error: directory ${stq}${i}${noc} was not found."				
 			fi
 		done
 		[ "${?}" = 0 ] && echo "  ${req}Departed rooms are ready for housekeeping${noc}" || echo "Upload appears to have encountered an error"
@@ -916,11 +920,10 @@ function cnctpg() {
 		fi
 		if [ ! -f "${c[ws]}${mv[1]}/${mv[3]}" ]; then
 			read -sq "yn?Target page not found. Reenter (y) or abort? (N) "
+			printf "\n"
 			if [ "${yn}" = "y" ]; then
 				r=1
 				cnctpg
-			else
-				printf "\n"
 			fi
 			return
 		fi
@@ -1143,7 +1146,7 @@ function mklink() {
 		fi
 		return
 	fi
-	mv[0]="$(echo "${mv[0]:A}" | sed -e "s/\\\(/\(/g" -e "s/\\\)/\)/g")"
+	mv[0]="$(echo "${mv[0]:A}" | sed -e "s/\\\(/\(/g" -e "s/\\\)/\)/g" -e "s/\\!/!/g" -e "s/\\!/!/g")"
 	rms
 	[[ "${mv[1]}" = *.gif ]] || mv[1]="${mv[1]}.gif"
 	if [ -f "${c[op]}${mv[1]}" ]; then
@@ -1326,10 +1329,10 @@ function mngfpg() {
 	done
 	r=0
 	if [ ! -f  "${c[ws]}${mv[2]%/index.*}/index.htm" -a ! -f "${c[ws]}${mv[2]%/index.*}/index.html" ]; then
-			mkmncp
-		else
-			ovrwrt mkmncp mnip
-		fi
+		mkmncp
+	else
+		ovrwrt mkmncp mnip
+	fi
 }
 function mvgfxa() {
 	fgf=;
@@ -1486,9 +1489,24 @@ function mvgifs() {
 			fi
 		done
 	else
+		fgf=;
+		lgf=;
+		printf "\n"
 		for i in {2..$(expr ${#mv[@]} - 1)}; do
-			mv -i "/${mv[1]}/${mv[${i}]}" "${c[ws]}${mv[0]}/${mv[${i}]}"
+			if [ -f "${c[ws]}${mv[0]}/${mv[${i}]}" ]; then
+				read -sq "yn?Target file ${mv[${i}]} exists. Overwrite (y) or skip? (N) "
+				printf "\n"
+				if [ "${yn}" != "y" ]; then
+					continue
+				fi
+			fi
+			mv -f "/${mv[1]}/${mv[${i}]}" "${c[ws]}${mv[0]}/${mv[${i}]}"
+			if [ "${?}" -eq 0 ]; then
+				[ -z "${fgf}" ] && fgf="${mv[${i}]}"
+				lgf="${mv[${i}]}"
+			fi
 		done
+		[ "${#mv[@]}" -eq 3 ] && echo "${req}${noc}The special guest at${noc} ${stq}${(C)fgf}${noc} ${req}has arrived${noc}" || "${req}${noc}The special party of${noc} ${stq}${(C)fgf}${noc} ${req}to${noc} ${stq}${(C)lgf}${noc} ${req}has arrived${noc}"
 		bb 56
 		read -sq "yn?Add path to upload queue? (y/N) "
 			if [ "${yn}" = "y" ]; then
@@ -1504,10 +1522,11 @@ function ovrwrt() {
 	if [ "${yn}" = "y" ]; then
 		printf "\n"
 		read -sq "yn?Overwrite (y) or reenter? (N) "
+		printf "\n"
 		if [ "${yn}" = "y" ]; then
-			printf "\n"
 			"${1}"
 		else
+			r=1
 			"${2}"
 		fi
 	else
@@ -1545,7 +1564,6 @@ function plclnk() {
 		fi
 	elif [[ "${pt}" =~ "mnsp" ]]; then
 		mnsz=;
-		echo "${pt}"
 		for i in {0..15}; do
 			if [[ "${pt#*.}" = "${mszo[${i}]%:*}" ]]; then
 				mnsz="${i}"

@@ -1,3 +1,11 @@
+## 210422-[v0.α7]
+
+#### Bugfixes
+- Better file handling moving gifs
+- Minor formatting issues
+- Improving conditional flavor text
+- Small fixes
+
 ## 210315-[v0.α6]
 
 #### Bugfixes
@@ -20,3 +28,4 @@
 
 [v0.α5]: https://github.com/kees-/ads/releases/tag/v0.%CE%B15
 [v0.α6]: https://github.com/kees-/ads/releases/tag/v0.%CE%B16
+[v0.α7]: https://github.com/kees-/ads/releases/tag/v0.%CE%B17
