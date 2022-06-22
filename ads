@@ -269,7 +269,7 @@ function cnct() {
 	fi
 	bb 48 49 37 33
 	echo "    Usage: ${stq}path-to-linking-page path-to-destination-page${noc}"
-	[ "${m}" != "E" ] && echo "    Note: Allows creation of links only between internal pages.\n    Add external hyperlinks with cap manager.\n    Enter paths relative to base web dir.\n    ${ulq}/index.htm${noc} not required for pages named as such. Include filename otherwise."
+	[ "${m}" != "E" ] && echo "    Note: Allows creation of links only between internal pages.\n    Add external hyperlinks with cap manager.\n    Enter paths relative to base web dir.\n    ${ulq}/index.html${noc} not required for pages named as such. Include filename otherwise."
 	cnctpg
 }
 function cpkl() {
@@ -308,7 +308,7 @@ function cppg() {
 	fi
 	bb 43 44 45 37 33
 	echo "    Usage: ${stq}path-containing-page${noc}"
-	[ "${m}" != "E" ] && echo "    Note: Enter path relative to base web dir. ${ulq}/index.htm${noc} not required.\n    Each page allows 26 custom images and unlimited external links."
+	[ "${m}" != "E" ] && echo "    Note: Enter path relative to base web dir. ${ulq}/index.html${noc} not required.\n    Each page allows 26 custom images and unlimited external links."
 	mkcapp
 }
 function lnkp() {
@@ -345,7 +345,7 @@ function lnkp() {
 			fi
 			return
 		fi
-		if [ ! -f  "${c[ws]}${mv[0]}/index.htm" -a ! -f "${c[ws]}${mv[0]}/index.html" ]; then
+		if [ ! -f  "${c[ws]}${mv[0]}/index.html" -a ! -f "${c[ws]}${mv[0]}/index.html" ]; then
 			mklpcp
 		else
 			ovrwrt mklpcp lnkp
@@ -525,7 +525,7 @@ function rlnk() {
 	x[6]=1
 	bb 34 35 36 37 33
 	echo "    Usage: ${stq}path-to-linking-page${noc}"
-	[ "${m}" != "E" ] && echo "    Note: enter path relative to base web dir. Escape spaces in path.\n    ${ulq}/index.htm${noc} not required for pages named as such."
+	[ "${m}" != "E" ] && echo "    Note: enter path relative to base web dir. Escape spaces in path.\n    ${ulq}/index.html${noc} not required for pages named as such."
 	remlnk
 }
 function sets() {
@@ -648,9 +648,9 @@ function blndpg() {
 	rms
 	for i in ${mv[@]}; do
 		if [ -d "${c[ws]}${i}" ]; then
-			if [[ ! -f "${c[ws]}${i}/index.htm" && ! -f "${c[ws]}${i}/index.html" ]]; then
-				cp "${c[blpg]}" "${c[ws]}${i}/index.htm"
-				blnm="${c[bl]}" envsubst < "${c[ws]}${i}/index.htm" > "${c[ws]}${i}/index.htm.tmp" && mv "${c[ws]}${i}/index.htm.tmp" "${c[ws]}${i}/index.htm"
+			if [[ ! -f "${c[ws]}${i}/index.html" && ! -f "${c[ws]}${i}/index.html" ]]; then
+				cp "${c[blpg]}" "${c[ws]}${i}/index.html"
+				blnm="${c[bl]}" envsubst < "${c[ws]}${i}/index.html" > "${c[ws]}${i}/index.html.tmp" && mv "${c[ws]}${i}/index.html.tmp" "${c[ws]}${i}/index.html"
 				x[4]=1
 				mvc=1
 			else
@@ -719,8 +719,8 @@ function capext() {
  				nme=;
  			fi
 		done
-		sed -i '' -e "/${c[sk]//\//\\/}/i\ "$'\n'"${c[sp]//\//\\/}" "${c[ws]}${mv[0]}/index.htm"
-		capurl="${lnk}" capnme="${nme}" envsubst < "${c[ws]}${mv[0]}/index.htm" > "${c[ws]}${mv[0]}/index.htm.tmp" && mv "${c[ws]}${mv[0]}/index.htm.tmp" "${c[ws]}${mv[0]}/index.htm"
+		sed -i '' -e "/${c[sk]//\//\\/}/i\ "$'\n'"${c[sp]//\//\\/}" "${c[ws]}${mv[0]}/index.html"
+		capurl="${lnk}" capnme="${nme}" envsubst < "${c[ws]}${mv[0]}/index.html" > "${c[ws]}${mv[0]}/index.html.tmp" && mv "${c[ws]}${mv[0]}/index.html.tmp" "${c[ws]}${mv[0]}/index.html"
 		bb 56
 		read -sq "yn?Add path to upload queue? (y/N) "
 		if [ "${yn}" = "y" ]; then
@@ -745,7 +745,7 @@ function capint() {
 	nme=;
 	dte=;
 	for i in {a..z}; do
-		grep -q "href=\"${i}.htm\"" "${c[ws]}${mv[0]}/index.htm"
+		grep -q "href=\"${i}.htm\"" "${c[ws]}${mv[0]}/index.html"
 		if [ "${?}" = "1" ]; then
 			printf "\n"
 			bb 46
@@ -760,7 +760,7 @@ function capint() {
 				return
 			fi
  			if curl -Ifso /dev/null "${lnk}" 2> /dev/null; then
- 				sed -i '' -e "/${c[sk]//\//\\/}/i\ "$'\n'"${c[sp]//\//\\/}" "${c[ws]}${mv[0]}/index.htm"
+ 				sed -i '' -e "/${c[sk]//\//\\/}/i\ "$'\n'"${c[sp]//\//\\/}" "${c[ws]}${mv[0]}/index.html"
  				cp "${c[cppg]}" "${c[ws]}${mv[0]}/${i}.htm"
  				until [ -n "${nme}" ]; do
  					echo "Enter title to display on page:"
@@ -783,7 +783,7 @@ function capint() {
 					printf "\n"
 					dte=""
 				fi
-				capnme="${nme}" capurl="${i}.htm" envsubst < "${c[ws]}${mv[0]}/index.htm" > "${c[ws]}${mv[0]}/index.htm.tmp" && mv "${c[ws]}${mv[0]}/index.htm.tmp" "${c[ws]}${mv[0]}/index.htm"
+				capnme="${nme}" capurl="${i}.htm" envsubst < "${c[ws]}${mv[0]}/index.html" > "${c[ws]}${mv[0]}/index.html.tmp" && mv "${c[ws]}${mv[0]}/index.html.tmp" "${c[ws]}${mv[0]}/index.html"
 				capnme="${nme}" capdte="${dte}" capimg="${lnk}" envsubst < "${c[ws]}${mv[0]}/${i}.htm" > "${c[ws]}${mv[0]}/${i}.htm.tmp" && mv "${c[ws]}${mv[0]}/${i}.htm.tmp" "${c[ws]}${mv[0]}/${i}.htm"
 				echo "  ${req}New cap inserted onto floor ${(U)i}${noc}"
 				bb 56
@@ -815,12 +815,12 @@ function caplst() {
 	capdsp=;
 	capdsp2=;
 	printf "\n"
-	for i in {1..$(grep -c "${c[sn]}" "${c[ws]}${mv[0]}/index.htm")}; do
-		capdsp[${i}]="$(grep -m${i} "${c[sn]}" "${c[ws]}${mv[0]}/index.htm" | tail -n1 | sed -e "s/^.*<a[^>]*>//" -e "s/<\/a>.*$//" | sed -e "s/^-->${c[se]//\//\\/} //" -e "s/<\!--$//")"
-		capdsp2[${i}]="$(grep -m${i} "${c[sn]}" "${c[ws]}${mv[0]}/index.htm" | tail -n1)"
+	for i in {1..$(grep -c "${c[sn]}" "${c[ws]}${mv[0]}/index.html")}; do
+		capdsp[${i}]="$(grep -m${i} "${c[sn]}" "${c[ws]}${mv[0]}/index.html" | tail -n1 | sed -e "s/^.*<a[^>]*>//" -e "s/<\/a>.*$//" | sed -e "s/^-->${c[se]//\//\\/} //" -e "s/<\!--$//")"
+		capdsp2[${i}]="$(grep -m${i} "${c[sn]}" "${c[ws]}${mv[0]}/index.html" | tail -n1)"
 		capdsp2[${i}]="${capdsp2[${i}]#*href=\"}"
 		capdsp2[${i}]="${capdsp2[${i}]%%\"*}"
-		[[ $(grep -m${i} "${c[sn]}" "${c[ws]}${mv[0]}/index.htm" | tail -n1) =~ "${c[se]}" ]] && capdsp3[${i}]="0" || capdsp3[${i}]="1"
+		[[ $(grep -m${i} "${c[sn]}" "${c[ws]}${mv[0]}/index.html" | tail -n1) =~ "${c[se]}" ]] && capdsp3[${i}]="0" || capdsp3[${i}]="1"
 		[ "${#capdsp2[${i}]}" -gt $((${COLUMNS} - 22)) ] && capdsp2[${i}]="$(echo "${capdsp2[${i}]}" | fold -w$((${COLUMNS} - 12 - $([ ${capdsp3[${i}]} = 0 ] && echo 10 || echo 0))) | head -n1)\033[0m..."
 		echo "  ${i}: ${ulq}${capdsp[${i}]}${noc}"
 		echo "    $([[ ${capdsp3[${i}]} = "0" ]] && echo "(EXPIRED) ")$([[ "${capdsp2[${i}]}" = [a-z]".htm" ]] && echo "${req}Occupies floor ${(U)capdsp2[${i}]%.htm}${noc}" || echo "\033[47m${capdsp2[${i}]}\033[0m")"
@@ -906,7 +906,7 @@ function cnctpg() {
 				mv[$(expr ${i} + 2)]="${mv[${i}]##*/}"
 				mv[${i}]="${mv[${i}]%/*.htm*}"
 			else
-				mv[$(expr ${i} + 2)]="index.htm"
+				mv[$(expr ${i} + 2)]="index.html"
 			fi
 		done
 		if [ ! -f "${c[ws]}${mv[0]}/${mv[2]}" ]; then
@@ -951,7 +951,7 @@ function kllcap() {
 			mv[0]="${mv[0]%/index.htm}"
 			mv[0]="${mv[0]%/index.html}"
 		fi
-		if [ ! -f "${c[ws]}/${mv[0]}/index.htm" ]; then
+		if [ ! -f "${c[ws]}/${mv[0]}/index.html" ]; then
 			read -sq "yn?Page to remove link not found. Reenter (y) or abort? (N) "
 			if [ "${yn}" = "y" ]; then
 				kllcap
@@ -961,7 +961,7 @@ function kllcap() {
 			fi
 			return
 		else
-			grep -q "${c[sn]}" "${c[ws]}/${mv[0]}/index.htm"
+			grep -q "${c[sn]}" "${c[ws]}/${mv[0]}/index.html"
 			if [ "${?}" = "1" ]; then
 				read -sq "yn?No cap links were found. Reenter (y) or abort? (N) "
 				if [ "${yn}" = "y" ]; then
@@ -972,8 +972,8 @@ function kllcap() {
 				return
 			else
 				echo "The following cap pages were found:"
-				for i in {1..$(grep -c "${c[sn]}" "${c[ws]}${mv[0]}/index.htm")}; do
-					mv[${i}]="${i}:$(grep -nm${i} "${c[sn]}" "${c[ws]}${mv[0]}/index.htm" | cut -f1 -d: | tail -n1):$(grep -m${i} "${c[sn]}" "${c[ws]}${mv[0]}/index.htm" | tail -n1 | sed -e "s/^.*<a[^>]*>//" -e "s/<\/a>.*$//" | sed -e "s/^-->${c[se]//\//\\/} //" -e "s/<\!--$//")"
+				for i in {1..$(grep -c "${c[sn]}" "${c[ws]}${mv[0]}/index.html")}; do
+					mv[${i}]="${i}:$(grep -nm${i} "${c[sn]}" "${c[ws]}${mv[0]}/index.html" | cut -f1 -d: | tail -n1):$(grep -m${i} "${c[sn]}" "${c[ws]}${mv[0]}/index.html" | tail -n1 | sed -e "s/^.*<a[^>]*>//" -e "s/<\/a>.*$//" | sed -e "s/^-->${c[se]//\//\\/} //" -e "s/<\!--$//")"
 					echo "  $(echo "${mv[${i}]}" | cut -f1 -d:): $(echo "${mv[${i}]}" | cut -f3 -d:)"
 				done
 				capsel=;
@@ -981,7 +981,7 @@ function kllcap() {
  					echo "Enter the number of the page to expire or remove:"
  					vared -cp "$(echo -ne "\xe2\x98\x8e\xef\xb8\x8f")  > " capsel
  				done
-				for i in {1..$(grep -c "${c[sn]}" "${c[ws]}/${mv[0]}/index.htm")}; do
+				for i in {1..$(grep -c "${c[sn]}" "${c[ws]}/${mv[0]}/index.html")}; do
 					if [ "${mv[${i}]%%:*}" = "${capsel}" ]; then
 						echo "Display expired cap (e) or remove both link and page completely? (r)"
 						while :; do
@@ -989,7 +989,7 @@ function kllcap() {
 							read -rsk1 inp
 							case ${inp} in
 								e)
-									sed "$(echo "${mv[${capsel}]}" | cut -f2 -d:)q;d" "${c[ws]}${mv[0]}/index.htm" | grep -q "${c[se]}"
+									sed "$(echo "${mv[${capsel}]}" | cut -f2 -d:)q;d" "${c[ws]}${mv[0]}/index.html" | grep -q "${c[se]}"
 									if [ "${?}" = 0 ]; then
 										printf "\n"
 										read -sq "yn?Selected cap appears to already be expired. Reenter (y) or abort? (N) "
@@ -1000,19 +1000,19 @@ function kllcap() {
 											return
 										fi
 									else
-										sed -i '' -e "$(echo "${mv[${capsel}]}" | cut -f2 -d:)s/${c[sn]}/&<\!--/" -e "$(echo "${mv[${capsel}]}" | cut -f2 -d:)s/<a[^>]*>/&-->${c[se]//\//\\/} /" -e "$(echo "${mv[${capsel}]}" | cut -f2 -d:)s/<\/a>/<\!--&-->/" "${c[ws]}/${mv[0]}/index.htm"
+										sed -i '' -e "$(echo "${mv[${capsel}]}" | cut -f2 -d:)s/${c[sn]}/&<\!--/" -e "$(echo "${mv[${capsel}]}" | cut -f2 -d:)s/<a[^>]*>/&-->${c[se]//\//\\/} /" -e "$(echo "${mv[${capsel}]}" | cut -f2 -d:)s/<\/a>/<\!--&-->/" "${c[ws]}/${mv[0]}/index.html"
 										x+=([0]=1 [5]=0)
 										break 
 									fi ;;
 								r)
-									mvtm="$(sed -ne "$(echo "${mv[${capsel}]}" | cut -f2 -d:)s/^<\!--[^\"]*\"//" -e "$(echo "${mv[${capsel}]}" | cut -f2 -d:)s/\" .*>//p" "${c[ws]}/${mv[0]}/index.htm")"
+									mvtm="$(sed -ne "$(echo "${mv[${capsel}]}" | cut -f2 -d:)s/^<\!--[^\"]*\"//" -e "$(echo "${mv[${capsel}]}" | cut -f2 -d:)s/\" .*>//p" "${c[ws]}/${mv[0]}/index.html")"
 									printf "\n"
 									if [ -f "${c[ws]}${mv[0]}/${mvtm}" ]; then
 										printf "Will remove link to page/title/page location without backup.\nProceed (y) or abort? (N) "
 										read -sq yn
 										printf "\n"
 										if [ "${yn}" = "y" ]; then
-											sed -i '' -e "$(echo "${mv[${capsel}]}" | cut -f2 -d:)d" "${c[ws]}/${mv[0]}/index.htm"
+											sed -i '' -e "$(echo "${mv[${capsel}]}" | cut -f2 -d:)d" "${c[ws]}/${mv[0]}/index.html"
 											[ -n "${c[ws]}" ] && rm "${c[ws]}${mv[0]}/${mvtm}"
 											if [ "${?}" = "0" ]; then
 												echo -n "  ${req}New vacancy on floor ${(U)mvtm%.*}${noc}"
@@ -1027,7 +1027,7 @@ function kllcap() {
 									else
 										read -sq "yn?Link and title will be removed. Proceed? (y/N) "
 										if [ "${yn}" = "y" ]; then
-											sed -i '' -e "$(echo "${mv[${capsel}]}" | cut -f2 -d:)d" "${c[ws]}/${mv[0]}/index.htm"
+											sed -i '' -e "$(echo "${mv[${capsel}]}" | cut -f2 -d:)d" "${c[ws]}/${mv[0]}/index.html"
 										fi
 									fi
 									break ;;
@@ -1087,7 +1087,7 @@ function mkcapp() {
 		if [[ "${mv[0]}" = */index.htm* ]]; then
 			mv[0]="${mv[0]%/index.htm*}"
 		fi
-		if [ ! -f "${c[ws]}/${mv[0]}/index.htm" ]; then
+		if [ ! -f "${c[ws]}/${mv[0]}/index.html" ]; then
 			read -sq "yn?Page to contain new link not found. Reenter (y) or abort? (N) "
 			printf "\n"
 			if [ "${yn}" = "y" ]; then
@@ -1097,12 +1097,12 @@ function mkcapp() {
 			return
 		else
 			printf "Create link to external URL (${ulq}e${noc}) or image display page? (${ulq}i${noc})\n"
-			[ "$(grep -c "${c[sn]}" "${c[ws]}${mv[0]}/index.htm")" -gt 0 ] && echo "Current caps can be listed with (${ulq}c${noc})"
+			[ "$(grep -c "${c[sn]}" "${c[ws]}${mv[0]}/index.html")" -gt 0 ] && echo "Current caps can be listed with (${ulq}c${noc})"
 			while :; do
 				printf "\r$(echo -ne "\xf0\x9f\x96\xbc")  > "
 				read -rsk1 i
 				case ${i} in
-					c) if [ "$(grep -c "${c[sn]}" "${c[ws]}${mv[0]}/index.htm")" -gt 0 ]; then
+					c) if [ "$(grep -c "${c[sn]}" "${c[ws]}${mv[0]}/index.html")" -gt 0 ]; then
 							caplst
 							break
 						fi ;;
@@ -1195,15 +1195,15 @@ function mklink() {
 }
 function mklpcp() {
 	[ ! -d "${c[ws]}${mv[0]}" ] && mkdir -p "${c[ws]}${mv[0]}"
-	cp "${c[lnpg]}" "${c[ws]}${mv[0]}/index.htm"
-	gflplk="${c[in]}${mv[1]}" envsubst < "${c[ws]}${mv[0]}/index.htm" > "${c[ws]}${mv[0]}/index.htm.tmp" && mv "${c[ws]}${mv[0]}/index.htm.tmp" "${c[ws]}${mv[0]}/index.htm"
+	cp "${c[lnpg]}" "${c[ws]}${mv[0]}/index.html"
+	gflplk="${c[in]}${mv[1]}" envsubst < "${c[ws]}${mv[0]}/index.html" > "${c[ws]}${mv[0]}/index.html.tmp" && mv "${c[ws]}${mv[0]}/index.html.tmp" "${c[ws]}${mv[0]}/index.html"
 	bb 56
 	read -sq "yn?Add path to upload queue? (y/N) "
 	if [ "${yn}" = "y" ]; then
 		s+=("${mv[0]}")
 		printf "\n"
 	else
-		echo "\nBe advised to safely add ${stq}${mv[0]}${noc} (containing index.htm)\nto your web host either with provided tool or external program."
+		echo "\nBe advised to safely add ${stq}${mv[0]}${noc} (containing index.html)\nto your web host either with provided tool or external program."
 	fi
 	bb 72 73
 }
@@ -1261,13 +1261,13 @@ function mkmini() {
 }
 function mkmncp() {
 	[ ! -d "${c[ws]}${mv[2]}" ] && mkdir -p "${c[ws]}${mv[2]}"
-	cp "${c[at]}${mszo[${mnsz}]%:*}${c[mnpg]}" "${c[ws]}${mv[2]%/index.*}/index.htm"
+	cp "${c[at]}${mszo[${mnsz}]%:*}${c[mnpg]}" "${c[ws]}${mv[2]%/index.*}/index.html"
 	for i in {0..$(expr ${#gi[@]} - 1)}; do
  		sv="gfmnlk${i}"
 		declare "${sv}"="${c[in]}${mv[3]}/${gi[${i}]}"
 		export ${sv}
 	done
-	envsubst < "${c[ws]}${mv[2]%/index.*}/index.htm" > "${c[ws]}${mv[2]%/index.*}/index.htm.tmp" && mv "${c[ws]}${mv[2]%/index.*}/index.htm.tmp" "${c[ws]}${mv[2]%/index.*}/index.htm"
+	envsubst < "${c[ws]}${mv[2]%/index.*}/index.html" > "${c[ws]}${mv[2]%/index.*}/index.html.tmp" && mv "${c[ws]}${mv[2]%/index.*}/index.html.tmp" "${c[ws]}${mv[2]%/index.*}/index.html"
 	r=0
 	bb 56
 	read -sq "yn?Add path to upload queue? (y/N) "
@@ -1275,7 +1275,7 @@ function mkmncp() {
 			s+=("${mv[2]}")
 			printf "\n"
 		else
-			echo "\nBe advised to safely add ${stq}${mv[2]}${noc} (containing index.htm)\nto your web host either with provided tool or external program."
+			echo "\nBe advised to safely add ${stq}${mv[2]}${noc} (containing index.html)\nto your web host either with provided tool or external program."
 		fi
 	bb 72 73
 }
@@ -1328,7 +1328,7 @@ function mngfpg() {
 		fi
 	done
 	r=0
-	if [ ! -f  "${c[ws]}${mv[2]%/index.*}/index.htm" -a ! -f "${c[ws]}${mv[2]%/index.*}/index.html" ]; then
+	if [ ! -f  "${c[ws]}${mv[2]%/index.*}/index.html" -a ! -f "${c[ws]}${mv[2]%/index.*}/index.html" ]; then
 		mkmncp
 	else
 		ovrwrt mkmncp mnip
@@ -1546,7 +1546,7 @@ function plclnk() {
 			fi
 			return
 		else
-			if [ "${mv[3]}" = "index.htm" ]; then
+			if [ "${mv[3]}" = "index.html" ]; then
 				mv[3]=;
 			else
 				mv[3]="/${mv[3]}"
@@ -1609,7 +1609,7 @@ function plclnk() {
 				if [ "$(expr "${i}" + 1)" = "${lnkpos}" ]; then
 					q2[2]=1
 					if [ "${lnkchk[${i}]}" = 0 ]; then
-						if [ "${mv[3]}" = "index.htm" ]; then
+						if [ "${mv[3]}" = "index.html" ]; then
 							mv[3]=;
 						else
 							mv[3]="/${mv[3]}"
@@ -1698,7 +1698,7 @@ function remlnk() {
 			mv[1]="${mv[0]##*/}"
 			mv[0]="${mv[0]%/*}"
 		else
-			mv[1]="index.htm"
+			mv[1]="index.html"
 		fi
 		if [ ! -f "${c[ws]}${mv[0]}/${mv[1]}" ]; then
 			read -sq "yn?Page not found. Reenter (y) or abort? (N) "

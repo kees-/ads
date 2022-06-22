@@ -6,7 +6,9 @@
 
 ⬜️ v0.α6 addressed minor fixes
 
-🔳 Current v0.α7 addresses minor fixes
+⬜️ Current v0.α7 addresses minor fixes
+
+🔳 Current version 0.1 isn't for you...
 
 
 ###### "Out of the box" (after a weird and unstable setup process)

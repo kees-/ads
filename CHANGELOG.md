@@ -1,3 +1,13 @@
+## ______-[v0.1]
+
+### Improvements
+- Change all instances of .htm to .html for compatibility ..
+
+## ______-[v0.α8]
+
+### Improvements
+- Disabled uploading parents to the web directory
+
 ## 210422-[v0.α7]
 
 #### Bugfixes
@@ -29,3 +39,5 @@
 [v0.α5]: https://github.com/kees-/ads/releases/tag/v0.%CE%B15
 [v0.α6]: https://github.com/kees-/ads/releases/tag/v0.%CE%B16
 [v0.α7]: https://github.com/kees-/ads/releases/tag/v0.%CE%B17
+[v0.α8]: https://github.com/kees-/ads/releases/tag/v0.%CE%B18
+[v0.1]: https://github.com/kees-/ads/releases/tag/v0.1
